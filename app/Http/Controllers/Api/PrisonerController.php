@@ -47,6 +47,8 @@ class PrisonerController extends Controller
     {
         $this->authorize('view', $prisoner);
 
+        $prisoner->load('currentHousing.cell.block');
+
         return new PrisonerResource($prisoner);
     }
 

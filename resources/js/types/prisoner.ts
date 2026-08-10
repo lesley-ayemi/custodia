@@ -14,6 +14,7 @@ export interface Prisoner {
     status: PrisonerStatus;
     photo_path: string | null;
     archived_at: string | null;
+    current_cell: { block_name: string; cell_code: string } | null;
 }
 
 export interface PaginatedResponse<T> {

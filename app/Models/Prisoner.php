@@ -8,6 +8,8 @@ use Database\Factories\PrisonerFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /** @use HasFactory<PrisonerFactory> */
 #[Fillable([
@@ -43,5 +45,15 @@ class Prisoner extends Model
     public function fullName(): string
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function housingAssignments(): HasMany
+    {
+        return $this->hasMany(HousingAssignment::class)->orderByDesc('started_at');
+    }
+
+    public function currentHousing(): HasOne
+    {
+        return $this->hasOne(HousingAssignment::class)->whereNull('ended_at')->latestOfMany('started_at');
     }
 }

@@ -47,6 +47,12 @@ const router = createRouter({
             component: () => import('../pages/prisoners/Show.vue'),
             meta: { requiresAuth: true },
         },
+        {
+            path: '/housing',
+            name: 'housing.index',
+            component: () => import('../pages/housing/Index.vue'),
+            meta: { requiresAuth: true },
+        },
     ],
 });
 

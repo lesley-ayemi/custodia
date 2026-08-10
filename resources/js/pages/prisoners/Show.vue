@@ -1,19 +1,30 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import DashboardLayout from '../../layouts/DashboardLayout.vue';
 import StatusBadge from '../../components/StatusBadge.vue';
+import HousingHistoryTimeline from '../../components/HousingHistoryTimeline.vue';
 import { usePrisonerStore } from '../../stores/prisoner';
+import { useHousingStore } from '../../stores/housing';
 import { useAuthStore } from '../../stores/auth';
 import type { Prisoner } from '../../types/prisoner';
+import type { HousingAssignment } from '../../types/housing';
 
 const route = useRoute();
 const router = useRouter();
-const store = usePrisonerStore();
+const prisonerStore = usePrisonerStore();
+const housingStore = useHousingStore();
 const auth = useAuthStore();
 
 const prisoner = ref<Prisoner | null>(null);
+const history = ref<HousingAssignment[]>([]);
 const archiving = ref(false);
+const assigning = ref(false);
+const selectedCellId = ref<number | null>(null);
+
+const availableCells = computed(() =>
+    housingStore.blocks.flatMap((block) => block.cells.map((cell) => ({ ...cell, blockName: block.name }))).filter((cell) => cell.available > 0),
+);
 
 function formatDate(value: string | null): string {
     if (!value) return '—';
@@ -21,7 +32,10 @@ function formatDate(value: string | null): string {
 }
 
 async function load(): Promise<void> {
-    prisoner.value = await store.fetchOne(Number(route.params.id));
+    const id = Number(route.params.id);
+    prisoner.value = await prisonerStore.fetchOne(id);
+    history.value = await housingStore.fetchHistory(id);
+    await housingStore.fetchBlocks();
 }
 
 async function archive(): Promise<void> {
@@ -29,10 +43,23 @@ async function archive(): Promise<void> {
     archiving.value = true;
 
     try {
-        await store.archive(prisoner.value.id);
+        await prisonerStore.archive(prisoner.value.id);
         await router.push({ name: 'prisoners.index' });
     } finally {
         archiving.value = false;
+    }
+}
+
+async function assignCell(): Promise<void> {
+    if (!prisoner.value || !selectedCellId.value) return;
+    assigning.value = true;
+
+    try {
+        await housingStore.assign(prisoner.value.id, selectedCellId.value);
+        selectedCellId.value = null;
+        await load();
+    } finally {
+        assigning.value = false;
     }
 }
 
@@ -66,6 +93,40 @@ onMounted(load);
                 <div>
                     <dt class="text-slate-500">Expected release</dt>
                     <dd class="mt-1 font-medium text-slate-900">{{ formatDate(prisoner.expected_release_date) }}</dd>
+                </div>
+            </div>
+
+            <div class="mt-6 grid max-w-4xl grid-cols-2 gap-6">
+                <div class="rounded-lg border border-slate-200 bg-white p-6">
+                    <h2 class="text-sm font-semibold text-slate-700">Current cell</h2>
+                    <p v-if="prisoner.current_cell" class="mt-2 text-lg font-medium text-slate-900">
+                        {{ prisoner.current_cell.block_name }} / {{ prisoner.current_cell.cell_code }}
+                    </p>
+                    <p v-else class="mt-2 text-sm text-slate-500">Not currently housed.</p>
+
+                    <div v-if="auth.hasRole('officer')" class="mt-4 flex items-center gap-2">
+                        <select v-model="selectedCellId" class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+                            <option :value="null">Select a cell…</option>
+                            <option v-for="cell in availableCells" :key="cell.id" :value="cell.id">
+                                {{ cell.blockName }} / {{ cell.code }} ({{ cell.available }} free)
+                            </option>
+                        </select>
+                        <button
+                            type="button"
+                            :disabled="!selectedCellId || assigning"
+                            class="shrink-0 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                            @click="assignCell"
+                        >
+                            {{ assigning ? 'Assigning…' : 'Assign' }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-slate-200 bg-white p-6">
+                    <h2 class="text-sm font-semibold text-slate-700">Housing history</h2>
+                    <div class="mt-4">
+                        <HousingHistoryTimeline :history="history" />
+                    </div>
                 </div>
             </div>
 

@@ -26,6 +26,10 @@ class PrisonerResource extends JsonResource
             'status' => $this->status->value,
             'photo_path' => $this->photo_path,
             'archived_at' => $this->archived_at?->toIso8601String(),
+            'current_cell' => $this->whenLoaded('currentHousing', fn () => $this->currentHousing ? [
+                'block_name' => $this->currentHousing->cell->block->name,
+                'cell_code' => $this->currentHousing->cell->code,
+            ] : null),
         ];
     }
 }

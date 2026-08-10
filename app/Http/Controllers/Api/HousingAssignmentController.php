@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\AssignHousingRequest;
+use App\Http\Resources\HousingAssignmentResource;
+use App\Models\Cell;
+use App\Models\Prisoner;
+use App\Services\HousingService;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+
+class HousingAssignmentController extends Controller
+{
+    public function __construct(
+        protected HousingService $housing,
+    ) {}
+
+    public function store(AssignHousingRequest $request): HousingAssignmentResource
+    {
+        $prisoner = Prisoner::findOrFail($request->validated('prisoner_id'));
+        $cell = Cell::findOrFail($request->validated('cell_id'));
+
+        $assignment = $this->housing->assign($prisoner, $cell, $request->user());
+
+        return new HousingAssignmentResource($assignment->load('cell.block', 'assignedBy'));
+    }
+
+    public function history(Prisoner $prisoner): AnonymousResourceCollection
+    {
+        $this->authorize('view', $prisoner);
+
+        $history = $prisoner->housingAssignments()->with('cell.block', 'assignedBy')->get();
+
+        return HousingAssignmentResource::collection($history);
+    }
+}
