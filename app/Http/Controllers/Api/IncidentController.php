@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreIncidentRequest;
 use App\Http\Resources\IncidentResource;
 use App\Models\Incident;
+use App\Services\AuditService;
 use App\Services\IncidentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -14,6 +15,7 @@ class IncidentController extends Controller
 {
     public function __construct(
         protected IncidentService $incidents,
+        protected AuditService $audit,
     ) {}
 
     public function index(Request $request): AnonymousResourceCollection
@@ -36,6 +38,12 @@ class IncidentController extends Controller
         $incident = $this->incidents->create([
             ...$request->validated(),
             'officer_id' => $request->user()->id,
+        ]);
+
+        $this->audit->log($request->user(), 'created', $incident, newValues: [
+            'incident_number' => $incident->incident_number,
+            'type' => $incident->type->value,
+            'severity' => $incident->severity->value,
         ]);
 
         return new IncidentResource($incident->load('prisoner', 'officer'));
@@ -62,6 +70,8 @@ class IncidentController extends Controller
         $this->authorize('review', $incident);
 
         $this->incidents->resolve($incident, $request->user());
+
+        $this->audit->log($request->user(), 'resolved', $incident, oldValues: ['status' => 'under_review'], newValues: ['status' => 'resolved']);
 
         return new IncidentResource($incident->load('prisoner', 'officer', 'resolvedBy'));
     }

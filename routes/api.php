@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlockController;
 use App\Http\Controllers\Api\DashboardController;
@@ -26,4 +27,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('incidents', IncidentController::class)->only(['index', 'store', 'show']);
     Route::post('/incidents/{incident}/review', [IncidentController::class, 'markUnderReview']);
     Route::post('/incidents/{incident}/resolve', [IncidentController::class, 'resolve']);
+
+    Route::get('/audit-logs', [AuditLogController::class, 'index']);
 });

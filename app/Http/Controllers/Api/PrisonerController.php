@@ -7,6 +7,7 @@ use App\Http\Requests\StorePrisonerRequest;
 use App\Http\Requests\UpdatePrisonerRequest;
 use App\Http\Resources\PrisonerResource;
 use App\Models\Prisoner;
+use App\Services\AuditService;
 use App\Services\PrisonerService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -15,6 +16,7 @@ class PrisonerController extends Controller
 {
     public function __construct(
         protected PrisonerService $prisoners,
+        protected AuditService $audit,
     ) {}
 
     public function index(Request $request): AnonymousResourceCollection
@@ -40,6 +42,12 @@ class PrisonerController extends Controller
     {
         $prisoner = $this->prisoners->create($request->validated());
 
+        $this->audit->log($request->user(), 'created', $prisoner, newValues: [
+            'prisoner_number' => $prisoner->prisoner_number,
+            'first_name' => $prisoner->first_name,
+            'last_name' => $prisoner->last_name,
+        ]);
+
         return new PrisonerResource($prisoner);
     }
 
@@ -54,7 +62,11 @@ class PrisonerController extends Controller
 
     public function update(UpdatePrisonerRequest $request, Prisoner $prisoner): PrisonerResource
     {
+        $oldValues = $prisoner->only(array_keys($request->validated()));
+
         $this->prisoners->update($prisoner, $request->validated());
+
+        $this->audit->log($request->user(), 'updated', $prisoner, oldValues: $oldValues, newValues: $request->validated());
 
         return new PrisonerResource($prisoner);
     }
@@ -64,6 +76,8 @@ class PrisonerController extends Controller
         $this->authorize('archive', $prisoner);
 
         $this->prisoners->archive($prisoner);
+
+        $this->audit->log($request->user(), 'archived', $prisoner);
 
         return new PrisonerResource($prisoner);
     }
