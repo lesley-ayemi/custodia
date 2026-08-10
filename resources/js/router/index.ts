@@ -53,6 +53,18 @@ const router = createRouter({
             component: () => import('../pages/housing/Index.vue'),
             meta: { requiresAuth: true },
         },
+        {
+            path: '/incidents',
+            name: 'incidents.index',
+            component: () => import('../pages/incidents/Index.vue'),
+            meta: { requiresAuth: true },
+        },
+        {
+            path: '/incidents/create',
+            name: 'incidents.create',
+            component: () => import('../pages/incidents/Create.vue'),
+            meta: { requiresAuth: true, roles: ['officer'] },
+        },
     ],
 });
 

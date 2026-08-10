@@ -27,6 +27,9 @@ async function logout(): Promise<void> {
                         <router-link :to="{ name: 'housing.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
                             Housing
                         </router-link>
+                        <router-link :to="{ name: 'incidents.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
+                            Incidents
+                        </router-link>
                     </nav>
                 </div>
                 <div class="flex items-center gap-4 text-sm">

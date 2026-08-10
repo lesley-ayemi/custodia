@@ -38,5 +38,6 @@ class DatabaseSeeder extends Seeder
         Prisoner::factory(40)->create();
 
         $this->call(HousingSeeder::class);
+        $this->call(IncidentSeeder::class);
     }
 }
