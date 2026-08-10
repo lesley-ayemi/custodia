@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlockController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\HousingAssignmentController;
 use App\Http\Controllers\Api\IncidentController;
 use App\Http\Controllers\Api\PrisonerController;
@@ -12,6 +13,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 
     Route::apiResource('prisoners', PrisonerController::class)->except(['destroy']);
     Route::post('/prisoners/{prisoner}/archive', [PrisonerController::class, 'archive']);

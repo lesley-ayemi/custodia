@@ -40,7 +40,11 @@ class IncidentSeeder extends Seeder
         $prisoners = Prisoner::inRandomOrder()->limit(count($this->statuses))->get();
         $incidents = app(IncidentService::class);
 
-        foreach ($this->statuses as $index => $status) {
+        // Shuffle so occurred_at (chronological) doesn't correlate with status,
+        // giving the dashboard's "recent incidents" a realistic mix of statuses.
+        $statuses = collect($this->statuses)->shuffle()->all();
+
+        foreach ($statuses as $index => $status) {
             $prisoner = $prisoners[$index % $prisoners->count()];
             $occurredAt = Carbon::now()->subDays(count($this->statuses) - $index)->subHours(random_int(1, 12));
 
