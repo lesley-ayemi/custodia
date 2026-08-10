@@ -29,6 +29,24 @@ const router = createRouter({
             component: () => import('../pages/Dashboard.vue'),
             meta: { requiresAuth: true },
         },
+        {
+            path: '/prisoners',
+            name: 'prisoners.index',
+            component: () => import('../pages/prisoners/Index.vue'),
+            meta: { requiresAuth: true },
+        },
+        {
+            path: '/prisoners/create',
+            name: 'prisoners.create',
+            component: () => import('../pages/prisoners/Create.vue'),
+            meta: { requiresAuth: true, roles: ['officer'] },
+        },
+        {
+            path: '/prisoners/:id',
+            name: 'prisoners.show',
+            component: () => import('../pages/prisoners/Show.vue'),
+            meta: { requiresAuth: true },
+        },
     ],
 });
 

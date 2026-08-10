@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\Role;
+use App\Models\Prisoner;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -33,5 +34,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'supervisor@demo.com',
             'role' => Role::Supervisor,
         ]);
+
+        Prisoner::factory(40)->create();
     }
 }

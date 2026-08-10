@@ -1,0 +1,84 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import DashboardLayout from '../../layouts/DashboardLayout.vue';
+import StatusBadge from '../../components/StatusBadge.vue';
+import { usePrisonerStore } from '../../stores/prisoner';
+import { useAuthStore } from '../../stores/auth';
+import type { Prisoner } from '../../types/prisoner';
+
+const route = useRoute();
+const router = useRouter();
+const store = usePrisonerStore();
+const auth = useAuthStore();
+
+const prisoner = ref<Prisoner | null>(null);
+const archiving = ref(false);
+
+function formatDate(value: string | null): string {
+    if (!value) return '—';
+    return new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+async function load(): Promise<void> {
+    prisoner.value = await store.fetchOne(Number(route.params.id));
+}
+
+async function archive(): Promise<void> {
+    if (!prisoner.value) return;
+    archiving.value = true;
+
+    try {
+        await store.archive(prisoner.value.id);
+        await router.push({ name: 'prisoners.index' });
+    } finally {
+        archiving.value = false;
+    }
+}
+
+onMounted(load);
+</script>
+
+<template>
+    <DashboardLayout>
+        <div v-if="prisoner">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">{{ prisoner.prisoner_number }}</p>
+                    <h1 class="text-2xl font-semibold text-slate-900">{{ prisoner.full_name }}</h1>
+                </div>
+                <StatusBadge :status="prisoner.status" />
+            </div>
+
+            <div class="mt-6 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-4 rounded-lg border border-slate-200 bg-white p-6 text-sm">
+                <div>
+                    <dt class="text-slate-500">Date of birth</dt>
+                    <dd class="mt-1 font-medium text-slate-900">{{ formatDate(prisoner.date_of_birth) }}</dd>
+                </div>
+                <div>
+                    <dt class="text-slate-500">Gender</dt>
+                    <dd class="mt-1 font-medium text-slate-900 capitalize">{{ prisoner.gender }}</dd>
+                </div>
+                <div>
+                    <dt class="text-slate-500">Admission date</dt>
+                    <dd class="mt-1 font-medium text-slate-900">{{ formatDate(prisoner.admission_date) }}</dd>
+                </div>
+                <div>
+                    <dt class="text-slate-500">Expected release</dt>
+                    <dd class="mt-1 font-medium text-slate-900">{{ formatDate(prisoner.expected_release_date) }}</dd>
+                </div>
+            </div>
+
+            <div v-if="auth.hasRole('officer')" class="mt-6">
+                <button
+                    type="button"
+                    :disabled="archiving"
+                    class="rounded-md border border-red-200 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
+                    @click="archive"
+                >
+                    {{ archiving ? 'Archiving…' : 'Archive prisoner' }}
+                </button>
+            </div>
+        </div>
+    </DashboardLayout>
+</template>
