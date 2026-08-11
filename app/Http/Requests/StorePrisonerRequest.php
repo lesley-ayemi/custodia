@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Prisoner;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePrisonerRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create', \App\Models\Prisoner::class);
+        return $this->user()->can('create', Prisoner::class);
     }
 
     /**

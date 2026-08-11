@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Prisoner;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Prisoner */
+/** @mixin Prisoner */
 class PrisonerResource extends JsonResource
 {
     /**

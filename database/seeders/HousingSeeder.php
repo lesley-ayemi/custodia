@@ -9,7 +9,6 @@ use App\Models\Cell;
 use App\Models\Prisoner;
 use App\Models\User;
 use App\Services\HousingService;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class HousingSeeder extends Seeder

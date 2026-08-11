@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\HousingAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\HousingAssignment */
+/** @mixin HousingAssignment */
 class HousingAssignmentResource extends JsonResource
 {
     /**

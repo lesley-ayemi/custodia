@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: custodia
+      POSTGRES_USER: custodia
+      POSTGRES_PASSWORD: custodia_local_dev
+    volumes:
+      - custodia_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U custodia -d custodia"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: Custodia
+      APP_ENV: production
+      APP_KEY: ${APP_KEY}
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: custodia
+      DB_USERNAME: custodia
+      DB_PASSWORD: custodia_local_dev
+      SESSION_DRIVER: database
+      SANCTUM_STATEFUL_DOMAINS: localhost:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "php artisan migrate --force &&
+             php artisan serve --host=0.0.0.0 --port=8000"
+
+volumes:
+  custodia_pgdata:
