@@ -71,6 +71,24 @@ const router = createRouter({
             component: () => import('../pages/audit/Index.vue'),
             meta: { requiresAuth: true, roles: ['admin', 'supervisor'] },
         },
+        {
+            path: '/users',
+            name: 'users.index',
+            component: () => import('../pages/users/Index.vue'),
+            meta: { requiresAuth: true, roles: ['admin'] },
+        },
+        {
+            path: '/users/create',
+            name: 'users.create',
+            component: () => import('../pages/users/Create.vue'),
+            meta: { requiresAuth: true, roles: ['admin'] },
+        },
+        {
+            path: '/users/:id',
+            name: 'users.show',
+            component: () => import('../pages/users/Show.vue'),
+            meta: { requiresAuth: true, roles: ['admin'] },
+        },
     ],
 });
 

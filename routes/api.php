@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\HousingAssignmentController;
 use App\Http\Controllers\Api\IncidentController;
 use App\Http\Controllers\Api\PrisonerController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -29,4 +30,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/incidents/{incident}/resolve', [IncidentController::class, 'resolve']);
 
     Route::get('/audit-logs', [AuditLogController::class, 'index']);
+
+    Route::apiResource('users', UserController::class);
 });

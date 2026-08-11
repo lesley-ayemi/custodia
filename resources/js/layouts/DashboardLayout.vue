@@ -38,6 +38,14 @@ async function logout(): Promise<void> {
                         >
                             Audit Log
                         </router-link>
+                        <router-link
+                            v-if="auth.hasRole('admin')"
+                            :to="{ name: 'users.index' }"
+                            class="hover:text-slate-900"
+                            active-class="font-semibold text-slate-900"
+                        >
+                            Staff
+                        </router-link>
                     </nav>
                 </div>
                 <div class="flex items-center gap-4 text-sm">
