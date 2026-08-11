@@ -91,6 +91,7 @@ onMounted(load);
                         <th class="px-4 py-3">Occurred</th>
                         <th class="px-4 py-3">Status</th>
                         <th v-if="auth.hasRole('supervisor', 'admin')" class="px-4 py-3">Actions</th>
+                        <th v-if="auth.hasRole('admin')" class="px-4 py-3"></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -121,9 +122,14 @@ onMounted(load);
                                 Resolve
                             </button>
                         </td>
+                        <td v-if="auth.hasRole('admin')" class="px-4 py-3">
+                            <router-link :to="{ name: 'incidents.edit', params: { id: incident.id } }" class="text-slate-600 hover:underline">
+                                Edit
+                            </router-link>
+                        </td>
                     </tr>
                     <tr v-if="!store.loading && store.incidents.length === 0">
-                        <td colspan="7" class="px-4 py-6 text-center text-slate-500">No incidents found.</td>
+                        <td colspan="8" class="px-4 py-6 text-center text-slate-500">No incidents found.</td>
                     </tr>
                 </tbody>
             </table>

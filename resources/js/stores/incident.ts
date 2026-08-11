@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import api from '../services/api';
 import type { PaginatedResponse } from '../types/prisoner';
-import type { Incident, IncidentFormData } from '../types/incident';
+import type { Incident, IncidentFormData, IncidentUpdateFormData } from '../types/incident';
 
 export const useIncidentStore = defineStore('incident', () => {
     const incidents = ref<Incident[]>([]);
@@ -28,9 +28,23 @@ export const useIncidentStore = defineStore('incident', () => {
         }
     }
 
+    async function fetchOne(id: number): Promise<Incident> {
+        const response = await api.get<Incident>(`/api/incidents/${id}`);
+        return response.data;
+    }
+
     async function create(data: IncidentFormData): Promise<Incident> {
         const response = await api.post<Incident>('/api/incidents', data);
         return response.data;
+    }
+
+    async function update(id: number, data: Partial<IncidentUpdateFormData>): Promise<Incident> {
+        const response = await api.put<Incident>(`/api/incidents/${id}`, data);
+        return response.data;
+    }
+
+    async function remove(id: number): Promise<void> {
+        await api.delete(`/api/incidents/${id}`);
     }
 
     async function markUnderReview(id: number): Promise<Incident> {
@@ -43,5 +57,5 @@ export const useIncidentStore = defineStore('incident', () => {
         return response.data;
     }
 
-    return { incidents, currentPage, lastPage, total, loading, fetchList, create, markUnderReview, resolve };
+    return { incidents, currentPage, lastPage, total, loading, fetchList, fetchOne, create, update, remove, markUnderReview, resolve };
 });

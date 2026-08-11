@@ -27,4 +27,14 @@ class IncidentPolicy
     {
         return $user->hasRole(Role::Supervisor, Role::Admin);
     }
+
+    public function update(User $user, Incident $incident): bool
+    {
+        return $user->hasRole(Role::Admin);
+    }
+
+    public function delete(User $user, Incident $incident): bool
+    {
+        return $user->hasRole(Role::Admin);
+    }
 }

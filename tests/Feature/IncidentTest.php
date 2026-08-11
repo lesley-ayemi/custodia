@@ -91,6 +91,62 @@ test('an admin can report, review, and resolve an incident', function () {
         ->assertJsonPath('status', 'resolved');
 });
 
+test('an admin can edit an incident', function () {
+    $admin = User::factory()->create(['role' => Role::Admin]);
+    $incident = Incident::factory()->for(Prisoner::factory())->create(['location' => 'Cafeteria', 'severity' => 'low']);
+
+    $response = $this->actingAs($admin)->putJson("/api/incidents/{$incident->id}", [
+        'location' => 'Workshop',
+        'severity' => 'high',
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonPath('location', 'Workshop');
+    $response->assertJsonPath('severity', 'high');
+});
+
+test('an officer cannot edit an incident', function () {
+    $officer = User::factory()->create(['role' => Role::Officer]);
+    $incident = Incident::factory()->for(Prisoner::factory())->create();
+
+    $this->actingAs($officer)->putJson("/api/incidents/{$incident->id}", ['location' => 'Workshop'])
+        ->assertForbidden();
+});
+
+test('a supervisor cannot edit an incident', function () {
+    $supervisor = User::factory()->create(['role' => Role::Supervisor]);
+    $incident = Incident::factory()->for(Prisoner::factory())->create();
+
+    $this->actingAs($supervisor)->putJson("/api/incidents/{$incident->id}", ['location' => 'Workshop'])
+        ->assertForbidden();
+});
+
+test('an admin can delete an incident and it disappears from the index', function () {
+    $admin = User::factory()->create(['role' => Role::Admin]);
+    $incident = Incident::factory()->for(Prisoner::factory())->create();
+
+    $this->actingAs($admin)->deleteJson("/api/incidents/{$incident->id}")->assertNoContent();
+
+    $this->assertSoftDeleted('incidents', ['id' => $incident->id]);
+
+    $response = $this->actingAs($admin)->getJson('/api/incidents');
+    expect(collect($response->json('data'))->pluck('id'))->not->toContain($incident->id);
+});
+
+test('an officer cannot delete an incident', function () {
+    $officer = User::factory()->create(['role' => Role::Officer]);
+    $incident = Incident::factory()->for(Prisoner::factory())->create(['officer_id' => $officer->id]);
+
+    $this->actingAs($officer)->deleteJson("/api/incidents/{$incident->id}")->assertForbidden();
+});
+
+test('a supervisor cannot delete an incident', function () {
+    $supervisor = User::factory()->create(['role' => Role::Supervisor]);
+    $incident = Incident::factory()->for(Prisoner::factory())->create();
+
+    $this->actingAs($supervisor)->deleteJson("/api/incidents/{$incident->id}")->assertForbidden();
+});
+
 test('incidents can be filtered by status', function () {
     $officer = User::factory()->create(['role' => Role::Officer]);
     Incident::factory()->for(Prisoner::factory())->create(['officer_id' => $officer->id, 'status' => 'reported']);

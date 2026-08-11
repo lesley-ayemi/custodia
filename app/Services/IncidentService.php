@@ -21,6 +21,21 @@ class IncidentService
         return Incident::create($data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function update(Incident $incident, array $data): Incident
+    {
+        $incident->update($data);
+
+        return $incident;
+    }
+
+    public function delete(Incident $incident): void
+    {
+        $incident->delete();
+    }
+
     public function markUnderReview(Incident $incident): Incident
     {
         $incident->status = IncidentStatus::UnderReview;

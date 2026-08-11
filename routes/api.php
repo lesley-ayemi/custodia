@@ -28,7 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/blocks', [BlockController::class, 'index']);
     Route::post('/housing-assignments', [HousingAssignmentController::class, 'store']);
 
-    Route::apiResource('incidents', IncidentController::class)->only(['index', 'store', 'show']);
+    Route::apiResource('incidents', IncidentController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
     Route::post('/incidents/{incident}/review', [IncidentController::class, 'markUnderReview']);
     Route::post('/incidents/{incident}/resolve', [IncidentController::class, 'resolve']);
 

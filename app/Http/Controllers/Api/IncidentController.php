@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreIncidentRequest;
+use App\Http\Requests\UpdateIncidentRequest;
 use App\Http\Resources\IncidentResource;
 use App\Models\Incident;
 use App\Services\AuditService;
 use App\Services\IncidentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class IncidentController extends Controller
 {
@@ -54,6 +56,31 @@ class IncidentController extends Controller
         $this->authorize('view', $incident);
 
         return new IncidentResource($incident->load('prisoner', 'officer', 'resolvedBy'));
+    }
+
+    public function update(UpdateIncidentRequest $request, Incident $incident): IncidentResource
+    {
+        $oldValues = $incident->only(array_keys($request->validated()));
+
+        $this->incidents->update($incident, $request->validated());
+
+        $this->audit->log($request->user(), 'updated', $incident, oldValues: $oldValues, newValues: $request->validated());
+
+        return new IncidentResource($incident->load('prisoner', 'officer', 'resolvedBy'));
+    }
+
+    public function destroy(Request $request, Incident $incident): Response
+    {
+        $this->authorize('delete', $incident);
+
+        $this->audit->log($request->user(), 'deleted', $incident, oldValues: [
+            'incident_number' => $incident->incident_number,
+            'status' => $incident->status->value,
+        ]);
+
+        $this->incidents->delete($incident);
+
+        return response()->noContent();
     }
 
     public function markUnderReview(Request $request, Incident $incident): IncidentResource

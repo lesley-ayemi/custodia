@@ -27,3 +27,12 @@ export interface IncidentFormData {
     description: string;
     occurred_at: string;
 }
+
+export interface IncidentUpdateFormData {
+    type: IncidentType;
+    severity: IncidentSeverity;
+    location: string;
+    description: string;
+    occurred_at: string;
+    status: IncidentStatus;
+}
