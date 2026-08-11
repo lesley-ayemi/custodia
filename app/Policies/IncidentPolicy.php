@@ -20,11 +20,11 @@ class IncidentPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole(Role::Officer);
+        return $user->hasRole(Role::Officer, Role::Admin);
     }
 
     public function review(User $user, Incident $incident): bool
     {
-        return $user->hasRole(Role::Supervisor);
+        return $user->hasRole(Role::Supervisor, Role::Admin);
     }
 }

@@ -73,6 +73,19 @@ test('housing history is returned in full for a prisoner', function () {
     expect($response->json())->toHaveCount(1);
 });
 
+test('an admin can assign a prisoner to a cell', function () {
+    $admin = User::factory()->create(['role' => Role::Admin]);
+    $prisoner = Prisoner::factory()->create();
+    $cell = makeCell();
+
+    $response = $this->actingAs($admin)->postJson('/api/housing-assignments', [
+        'prisoner_id' => $prisoner->id,
+        'cell_id' => $cell->id,
+    ]);
+
+    $response->assertCreated();
+});
+
 test('a supervisor cannot assign a prisoner to a cell', function () {
     $supervisor = User::factory()->create(['role' => Role::Supervisor]);
     $prisoner = Prisoner::factory()->create();

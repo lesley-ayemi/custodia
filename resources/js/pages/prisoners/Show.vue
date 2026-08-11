@@ -104,7 +104,7 @@ onMounted(load);
                     </p>
                     <p v-else class="mt-2 text-sm text-slate-500">Not currently housed.</p>
 
-                    <div v-if="auth.hasRole('officer')" class="mt-4 flex items-center gap-2">
+                    <div v-if="auth.hasRole('officer', 'admin')" class="mt-4 flex items-center gap-2">
                         <select v-model="selectedCellId" class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
                             <option :value="null">Select a cell…</option>
                             <option v-for="cell in availableCells" :key="cell.id" :value="cell.id">
@@ -130,7 +130,7 @@ onMounted(load);
                 </div>
             </div>
 
-            <div v-if="auth.hasRole('officer')" class="mt-6">
+            <div v-if="auth.hasRole('officer', 'admin')" class="mt-6">
                 <button
                     type="button"
                     :disabled="archiving"

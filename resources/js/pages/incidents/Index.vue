@@ -59,7 +59,7 @@ onMounted(load);
         <div class="flex items-center justify-between">
             <h1 class="text-xl font-semibold text-slate-900">Incidents</h1>
             <router-link
-                v-if="auth.hasRole('officer')"
+                v-if="auth.hasRole('officer', 'admin')"
                 :to="{ name: 'incidents.create' }"
                 class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
             >
@@ -90,7 +90,7 @@ onMounted(load);
                         <th class="px-4 py-3">Severity</th>
                         <th class="px-4 py-3">Occurred</th>
                         <th class="px-4 py-3">Status</th>
-                        <th v-if="auth.hasRole('supervisor')" class="px-4 py-3">Actions</th>
+                        <th v-if="auth.hasRole('supervisor', 'admin')" class="px-4 py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -101,7 +101,7 @@ onMounted(load);
                         <td class="px-4 py-3 text-slate-500 capitalize">{{ incident.severity }}</td>
                         <td class="px-4 py-3 text-slate-500">{{ formatDate(incident.occurred_at) }}</td>
                         <td class="px-4 py-3"><StatusBadge :status="incident.status" /></td>
-                        <td v-if="auth.hasRole('supervisor')" class="space-x-2 px-4 py-3">
+                        <td v-if="auth.hasRole('supervisor', 'admin')" class="space-x-2 px-4 py-3">
                             <button
                                 v-if="incident.status === 'reported'"
                                 type="button"

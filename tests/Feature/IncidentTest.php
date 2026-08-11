@@ -67,6 +67,30 @@ test('an officer cannot review or resolve an incident', function () {
     $this->actingAs($officer)->postJson("/api/incidents/{$incident->id}/resolve")->assertForbidden();
 });
 
+test('an admin can report, review, and resolve an incident', function () {
+    $admin = User::factory()->create(['role' => Role::Admin]);
+    $prisoner = Prisoner::factory()->create();
+
+    $response = $this->actingAs($admin)->postJson('/api/incidents', [
+        'prisoner_id' => $prisoner->id,
+        'type' => 'property_damage',
+        'severity' => 'medium',
+        'location' => 'Block A Yard',
+        'description' => 'Prisoner damaged furniture during a dispute.',
+        'occurred_at' => now()->toIso8601String(),
+    ]);
+    $response->assertCreated();
+    $incidentId = $response->json('id');
+
+    $this->actingAs($admin)->postJson("/api/incidents/{$incidentId}/review")
+        ->assertOk()
+        ->assertJsonPath('status', 'under_review');
+
+    $this->actingAs($admin)->postJson("/api/incidents/{$incidentId}/resolve")
+        ->assertOk()
+        ->assertJsonPath('status', 'resolved');
+});
+
 test('incidents can be filtered by status', function () {
     $officer = User::factory()->create(['role' => Role::Officer]);
     Incident::factory()->for(Prisoner::factory())->create(['officer_id' => $officer->id, 'status' => 'reported']);

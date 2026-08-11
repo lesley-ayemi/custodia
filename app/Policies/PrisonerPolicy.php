@@ -20,16 +20,16 @@ class PrisonerPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole(Role::Officer);
+        return $user->hasRole(Role::Officer, Role::Admin);
     }
 
     public function update(User $user, Prisoner $prisoner): bool
     {
-        return $user->hasRole(Role::Officer);
+        return $user->hasRole(Role::Officer, Role::Admin);
     }
 
     public function archive(User $user, Prisoner $prisoner): bool
     {
-        return $user->hasRole(Role::Officer);
+        return $user->hasRole(Role::Officer, Role::Admin);
     }
 }

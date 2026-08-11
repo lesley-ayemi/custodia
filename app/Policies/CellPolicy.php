@@ -19,6 +19,6 @@ class CellPolicy
 
     public function assign(User $user): bool
     {
-        return $user->hasRole(Role::Officer);
+        return $user->hasRole(Role::Officer, Role::Admin);
     }
 }

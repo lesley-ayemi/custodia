@@ -23,7 +23,7 @@ test('an officer can register a prisoner', function () {
     $this->assertDatabaseHas('prisoners', ['first_name' => 'Daniel', 'last_name' => 'Johnson']);
 });
 
-test('an admin cannot register a prisoner', function () {
+test('an admin can register a prisoner', function () {
     $admin = User::factory()->create(['role' => Role::Admin]);
 
     $response = $this->actingAs($admin)->postJson('/api/prisoners', [
@@ -34,7 +34,7 @@ test('an admin cannot register a prisoner', function () {
         'admission_date' => '2026-08-10',
     ]);
 
-    $response->assertForbidden();
+    $response->assertCreated();
 });
 
 test('a supervisor cannot register a prisoner', function () {

@@ -39,7 +39,7 @@ const router = createRouter({
             path: '/prisoners/create',
             name: 'prisoners.create',
             component: () => import('../pages/prisoners/Create.vue'),
-            meta: { requiresAuth: true, roles: ['officer'] },
+            meta: { requiresAuth: true, roles: ['officer', 'admin'] },
         },
         {
             path: '/prisoners/:id',
@@ -63,7 +63,7 @@ const router = createRouter({
             path: '/incidents/create',
             name: 'incidents.create',
             component: () => import('../pages/incidents/Create.vue'),
-            meta: { requiresAuth: true, roles: ['officer'] },
+            meta: { requiresAuth: true, roles: ['officer', 'admin'] },
         },
         {
             path: '/audit',
