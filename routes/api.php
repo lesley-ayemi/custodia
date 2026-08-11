@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlockController;
+use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CourtCaseController;
 use App\Http\Controllers\Api\CourtHearingController;
 use App\Http\Controllers\Api\DashboardController;
@@ -25,7 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/prisoners/{prisoner}/archive', [PrisonerController::class, 'archive']);
     Route::get('/prisoners/{prisoner}/housing-history', [HousingAssignmentController::class, 'history']);
 
-    Route::get('/blocks', [BlockController::class, 'index']);
+    Route::apiResource('blocks', BlockController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::apiResource('cells', CellController::class)->only(['store', 'update', 'destroy']);
     Route::post('/housing-assignments', [HousingAssignmentController::class, 'store']);
 
     Route::apiResource('incidents', IncidentController::class)->only(['index', 'store', 'show', 'update', 'destroy']);

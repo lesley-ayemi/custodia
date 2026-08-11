@@ -1,5 +1,6 @@
 export interface CellSummary {
     id: number;
+    block_id?: number;
     code: string;
     capacity: number;
     occupancy: number;
