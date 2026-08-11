@@ -60,6 +60,12 @@ const router = createRouter({
             meta: { requiresAuth: true },
         },
         {
+            path: '/court',
+            name: 'court.index',
+            component: () => import('../pages/court/Index.vue'),
+            meta: { requiresAuth: true },
+        },
+        {
             path: '/incidents/create',
             name: 'incidents.create',
             component: () => import('../pages/incidents/Create.vue'),

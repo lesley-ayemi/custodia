@@ -56,4 +56,9 @@ class Prisoner extends Model
     {
         return $this->hasOne(HousingAssignment::class)->whereNull('ended_at')->latestOfMany('started_at');
     }
+
+    public function courtCases(): HasMany
+    {
+        return $this->hasMany(CourtCase::class)->orderByDesc('opened_at');
+    }
 }

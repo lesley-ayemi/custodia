@@ -10,6 +10,12 @@ const colorClasses: Record<string, string> = {
     reported: 'bg-amber-100 text-amber-800',
     under_review: 'bg-blue-100 text-blue-800',
     resolved: 'bg-emerald-100 text-emerald-800',
+    open: 'bg-blue-100 text-blue-800',
+    adjourned: 'bg-amber-100 text-amber-800',
+    closed: 'bg-slate-100 text-slate-600',
+    scheduled: 'bg-blue-100 text-blue-800',
+    completed: 'bg-emerald-100 text-emerald-800',
+    cancelled: 'bg-slate-100 text-slate-600',
 };
 
 const label = computed(() =>

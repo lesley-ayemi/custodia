@@ -3,9 +3,12 @@
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlockController;
+use App\Http\Controllers\Api\CourtCaseController;
+use App\Http\Controllers\Api\CourtHearingController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\HousingAssignmentController;
 use App\Http\Controllers\Api\IncidentController;
+use App\Http\Controllers\Api\LegalRepresentativeController;
 use App\Http\Controllers\Api\PrisonerController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -32,4 +35,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/audit-logs', [AuditLogController::class, 'index']);
 
     Route::apiResource('users', UserController::class);
+
+    Route::get('/court-hearings/upcoming', [CourtHearingController::class, 'upcoming']);
+    Route::get('/prisoners/{prisoner}/court-cases', [CourtCaseController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/court-cases', [CourtCaseController::class, 'store']);
+    Route::get('/court-cases/{courtCase}', [CourtCaseController::class, 'show']);
+    Route::post('/court-cases/{courtCase}/hearings', [CourtHearingController::class, 'store']);
+
+    Route::get('/legal-representatives', [LegalRepresentativeController::class, 'index']);
+    Route::post('/legal-representatives', [LegalRepresentativeController::class, 'store']);
 });
