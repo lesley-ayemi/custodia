@@ -7,6 +7,7 @@ use App\Models\Prisoner;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,27 +18,28 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Ava Admin',
-            'email' => 'admin@demo.com',
-            'role' => Role::Admin,
-        ]);
+        // updateOrCreate keeps these demo accounts idempotent — db:seed can be
+        // re-run safely instead of failing on a duplicate email.
+        User::query()->updateOrCreate(
+            ['email' => 'admin@demo.com'],
+            ['name' => 'Ava Admin', 'password' => Hash::make('password'), 'role' => Role::Admin],
+        );
 
-        User::factory()->create([
-            'name' => 'Owen Officer',
-            'email' => 'officer@demo.com',
-            'role' => Role::Officer,
-        ]);
+        User::query()->updateOrCreate(
+            ['email' => 'officer@demo.com'],
+            ['name' => 'Owen Officer', 'password' => Hash::make('password'), 'role' => Role::Officer],
+        );
 
-        User::factory()->create([
-            'name' => 'Sara Supervisor',
-            'email' => 'supervisor@demo.com',
-            'role' => Role::Supervisor,
-        ]);
+        User::query()->updateOrCreate(
+            ['email' => 'supervisor@demo.com'],
+            ['name' => 'Sara Supervisor', 'password' => Hash::make('password'), 'role' => Role::Supervisor],
+        );
 
-        Prisoner::factory(40)->create();
+        if (Prisoner::query()->count() === 0) {
+            Prisoner::factory(40)->create();
 
-        $this->call(HousingSeeder::class);
-        $this->call(IncidentSeeder::class);
+            $this->call(HousingSeeder::class);
+            $this->call(IncidentSeeder::class);
+        }
     }
 }
