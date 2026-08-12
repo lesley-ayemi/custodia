@@ -71,4 +71,9 @@ class Prisoner extends Model
     {
         return $this->hasMany(ProgrammeEnrolment::class)->orderByDesc('enrolled_at');
     }
+
+    public function releaseReviews(): HasMany
+    {
+        return $this->hasMany(ReleaseReview::class)->orderByDesc('initiated_at');
+    }
 }

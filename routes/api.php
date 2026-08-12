@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\ProgrammeAttendanceController;
 use App\Http\Controllers\Api\ProgrammeController;
 use App\Http\Controllers\Api\ProgrammeEnrolmentController;
 use App\Http\Controllers\Api\PropertyItemController;
+use App\Http\Controllers\Api\ReleaseReviewController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -61,4 +62,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/programme-enrolments/{programmeEnrolment}/complete', [ProgrammeEnrolmentController::class, 'complete']);
     Route::post('/programme-enrolments/{programmeEnrolment}/withdraw', [ProgrammeEnrolmentController::class, 'withdraw']);
     Route::post('/programme-enrolments/{programmeEnrolment}/attendance', [ProgrammeAttendanceController::class, 'store']);
+
+    Route::get('/release-reviews', [ReleaseReviewController::class, 'index']);
+    Route::get('/prisoners/{prisoner}/release-reviews', [ReleaseReviewController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/release-reviews', [ReleaseReviewController::class, 'store']);
+    Route::post('/release-reviews/{releaseReview}/legal-verification', [ReleaseReviewController::class, 'recordLegalVerification']);
+    Route::post('/release-reviews/{releaseReview}/sentence-verification', [ReleaseReviewController::class, 'recordSentenceVerification']);
+    Route::post('/release-reviews/{releaseReview}/property-verification', [ReleaseReviewController::class, 'recordPropertyVerification']);
+    Route::post('/release-reviews/{releaseReview}/documentation', [ReleaseReviewController::class, 'recordDocumentation']);
+    Route::post('/release-reviews/{releaseReview}/supervisor-approval', [ReleaseReviewController::class, 'approveBySupervisor']);
+    Route::post('/release-reviews/{releaseReview}/cancel', [ReleaseReviewController::class, 'cancel']);
 });
