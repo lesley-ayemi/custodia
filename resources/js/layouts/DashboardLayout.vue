@@ -40,6 +40,14 @@ async function logout(): Promise<void> {
                             Releases
                         </router-link>
                         <router-link
+                            v-if="auth.hasRole('admin', 'officer', 'supervisor')"
+                            :to="{ name: 'visitors.index' }"
+                            class="hover:text-slate-900"
+                            active-class="font-semibold text-slate-900"
+                        >
+                            Visitors
+                        </router-link>
+                        <router-link
                             v-if="auth.hasRole('medical', 'admin')"
                             :to="{ name: 'medical.index' }"
                             class="hover:text-slate-900"

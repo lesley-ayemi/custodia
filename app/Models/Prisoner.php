@@ -96,4 +96,14 @@ class Prisoner extends Model
     {
         return $this->hasMany(MedicalAlert::class)->orderByDesc('created_at');
     }
+
+    public function visitRequests(): HasMany
+    {
+        return $this->hasMany(VisitRequest::class)->orderByDesc('requested_visit_date');
+    }
+
+    public function visits(): HasMany
+    {
+        return $this->hasMany(Visit::class)->orderByDesc('scheduled_at');
+    }
 }

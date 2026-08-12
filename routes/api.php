@@ -21,6 +21,9 @@ use App\Http\Controllers\Api\ProgrammeEnrolmentController;
 use App\Http\Controllers\Api\PropertyItemController;
 use App\Http\Controllers\Api\ReleaseReviewController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\VisitController;
+use App\Http\Controllers\Api\VisitorController;
+use App\Http\Controllers\Api\VisitRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -94,4 +97,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/prisoners/{prisoner}/medical-alerts', [MedicalAlertController::class, 'store']);
     Route::put('/medical-alerts/{medicalAlert}', [MedicalAlertController::class, 'update']);
     Route::post('/medical-alerts/{medicalAlert}/resolve', [MedicalAlertController::class, 'resolve']);
+
+    Route::get('/visitors', [VisitorController::class, 'index']);
+    Route::post('/visitors', [VisitorController::class, 'store']);
+
+    Route::get('/prisoners/{prisoner}/visit-requests', [VisitRequestController::class, 'indexForPrisoner']);
+    Route::post('/visit-requests', [VisitRequestController::class, 'store']);
+    Route::post('/visit-requests/{visitRequest}/approve', [VisitRequestController::class, 'approve']);
+    Route::post('/visit-requests/{visitRequest}/reject', [VisitRequestController::class, 'reject']);
+
+    Route::get('/visits/upcoming', [VisitController::class, 'upcoming']);
+    Route::get('/prisoners/{prisoner}/visits', [VisitController::class, 'indexForPrisoner']);
+    Route::post('/visits/{visit}/check-in', [VisitController::class, 'checkIn']);
+    Route::post('/visits/{visit}/check-out', [VisitController::class, 'checkOut']);
+    Route::post('/visits/{visit}/cancel', [VisitController::class, 'cancel']);
 });
