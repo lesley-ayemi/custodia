@@ -1,96 +1,88 @@
 # Custodia — Prison Management System
 
-A custody and welfare management system for a correctional facility: admissions, housing,
-sentences, court cases, medical care, visits, movements and releases — with a full audit trail
-on every action.
+A custody and welfare management system for a correctional facility. It covers admissions,
+housing, sentences, court cases, medical care, visits, movements and releases, and keeps an
+audit trail of every action taken in it.
 
 ## Why I built this
 
-Nigeria's correctional system has a records problem before it has anything else.
+This one comes from how prisons are run back home.
 
-Most of what goes wrong in a Nigerian prison is downstream of not knowing things: who is in this
-facility, what legal authority is holding them, when they are due out, which court date they
-missed, who authorised the transfer. A large share of the inmate population is awaiting trial
-rather than serving a sentence, facilities run well over their designed capacity, and record
-keeping in many of them is still paper — ledgers, case files in envelopes, entries in
-handwriting. When the paper is the only copy, a lost file is a lost person. People sit past
-their release date because nobody can produce the document that proves the date. Nobody set out
-for that to happen; the system just has no way to notice.
+Most Nigerian correctional facilities still keep their records on paper. Custody registers,
+case files, court dates, property receipts: all of it handwritten into ledgers and folders.
+On top of that, the facilities are badly overcrowded, and a large share of the people inside
+are awaiting trial rather than serving a sentence, so the population is constantly churning.
 
-That's a software problem, and a fairly ordinary one. So I built the thing I'd want if I were
-handed that brief.
+The result is that nobody can reliably answer basic questions about who is in the building.
+People get held past their release date because the document proving the date has gone
+missing. Court appearances get missed. Transfers happen without any record of who approved
+them. You don't need anyone to be acting in bad faith for this to happen. A paper system just
+has no way of noticing when something has gone wrong.
 
-The design follows from the failure modes rather than from a feature list:
+That's the kind of problem software is genuinely good at, so I wanted to see what a serious
+attempt at it would look like. The features here were chosen to close specific gaps rather
+than to pad out a feature list:
 
-| The problem | What the system does about it |
-|---|---|
-| No paper trail of who changed what | Every mutation writes an append-only audit entry — actor, action, before/after — inside the same database transaction as the change, so a state change and its record cannot come apart |
-| People held with no traceable legal basis | Admission can't progress past intake until the legal authority reference is recorded; sentences carry court, offence, legal status and parole eligibility |
-| People held past their release date | Sentence end dates and parole eligibility are first-class fields, not notes in a margin |
-| Releases happening without checks | Release runs a five-step chain — legal, sentence, property, documentation — that ends in a supervisor sign-off no officer can bypass |
-| Overcrowding only visible once it's a crisis | Occupancy is derived live from active assignments at cell, wing and block level |
-| "Who authorised this?" | Four roles enforced by Laravel Policies; the acting user is recorded on every action |
-| Medical information treated as general staff information | Medical records sit behind a dedicated Medical role — officers and supervisors see operational alerts only, never clinical detail |
+- Every change writes an audit entry (who, what, before and after) in the same database
+  transaction as the change itself, so the record can't survive without the change or vice versa.
+- An admission can't move past intake until someone records the legal authority for holding
+  the person. Sentences store the court, offence, legal status and parole eligibility date.
+- Releases go through a five-step review covering legal status, sentence, property and
+  documentation, and the last step is a supervisor approval that officers can't perform.
+- Occupancy is counted live from active assignments, so overcrowding is visible per cell, wing
+  and block instead of surfacing only when a cell is obviously full.
+- Medical records sit behind a Medical role. Officers and supervisors see the operational
+  alerts they need to work safely and nothing clinical.
 
-It's a portfolio project, not a deployment. But the constraints I designed against are real ones.
+It's a portfolio project and I'm not pretending otherwise, but the constraints I designed
+against are real.
 
 ## Stack
 
-- Laravel 13 (API), Laravel Sanctum (SPA cookie auth)
-- Vue 3 + TypeScript + Vue Router + Pinia, served via Vite through a single Blade shell
+- Laravel 13 (API) with Laravel Sanctum for SPA cookie auth
+- Vue 3, TypeScript, Vue Router and Pinia, served through a single Blade shell via Vite
 - PostgreSQL
-- Tailwind CSS 4 (+ `@tailwindcss/forms`), Lucide icons
-- Docker (optional — see below)
+- Tailwind CSS 4 with `@tailwindcss/forms`, and Lucide icons
+- Docker, optionally (see below)
 
 ## What's in it
 
-**Custody**
+Custody is the core of it. Admissions run as a staged intake: create the prisoner record,
+record the legal authority, do an initial assessment, set a security classification, complete
+a medical screening, assign housing. Each stage has to be finished before the next opens up,
+and the medical screening can only be signed off by medical staff. Prisoners can be
+registered, searched, viewed and archived. The estate is modelled as Facility → Block → Wing →
+Cell, with occupancy derived from active assignments so it can't fall out of sync. Housing
+assignments are stored as a history table with `started_at` and `ended_at` rather than a
+single `cell_id` column on the prisoner, which means every prisoner has a full cell timeline.
+Movements handle transfers and escorts through a requested → approved → departed → arrived →
+returned lifecycle, and property is logged in at intake and signed out on discharge.
 
-- **Admissions** — a staged intake workflow: create the prisoner record, record legal authority,
-  initial assessment, security classification, medical screening (medical staff only), housing
-  assignment, complete. Each stage gates the next.
-- **Prisoners** — register, search, view, archive.
-- **Prison structure** — Facility → Block → Wing → Cell, with occupancy derived from active
-  assignments rather than stored (so it can't drift).
-- **Housing assignments** — a history table with `started_at`/`ended_at` rather than a
-  `prisoners.cell_id` column, so every prisoner keeps a full cell timeline.
-- **Movements** — transfers and escorts with a requested → approved → departed → arrived →
-  returned lifecycle.
-- **Property** — belongings logged in at intake and signed out on discharge.
+For case management there are sentences (case number, court, offence, dates, type, parole
+eligibility, legal status), court cases with their hearings and legal representatives, and
+incident reporting that moves from reported to under review to resolved.
 
-**Case management**
+The welfare side covers medical records, appointments, prescriptions and alerts, all
+restricted to the Medical role. Rehabilitation programmes track enrolment and attendance.
+Visits work off a shared visitor registry: a request needs supervisor approval before it
+becomes a scheduled visit, is rejected outright if the visitor is banned, and officers handle
+check-in and check-out at the desk. Releases run the five-step review described above.
 
-- **Sentences** — case number, court, offence, start/end, sentence type, parole eligibility,
-  legal status.
-- **Court** — cases, hearings and legal representatives, with an upcoming-hearings view.
-- **Incidents** — Reported → Under Review → Resolved, with severity and officer attribution.
-
-**Welfare**
-
-- **Medical** — records, appointments, prescriptions and alerts, restricted to the Medical role.
-  Other staff see only the operational alerts they need to do their job safely.
-- **Programmes** — rehabilitation programmes with enrolment and attendance tracking.
-- **Visits** — a shared visitor registry, visit requests requiring supervisor approval (rejected
-  outright for banned visitors), and desk check-in/check-out.
-- **Releases** — the five-step review chain ending in supervisor approval.
-
-**Oversight**
-
-- **Dashboard** — population, occupancy, open incidents and available beds.
-- **Audit log** — append-only trail of who did what, with before/after values.
+Oversight is a dashboard with population, occupancy, open incidents and available beds, plus
+the audit log.
 
 ## Roles
 
 | Role | Can do |
 |---|---|
 | Admin | Everything, including staff management |
-| Officer | Day-to-day custody operations — admissions, housing, incidents, property, visits |
-| Supervisor | Review and sign-off — incident resolution, visit approval, movement and release approval |
+| Officer | Day-to-day custody work: admissions, housing, incidents, property, visits |
+| Supervisor | Review and sign-off: incident resolution, visit approval, movement and release approval |
 | Medical | Clinical records, appointments, prescriptions, and the admission medical screening |
 
 ## Demo accounts
 
-Seeded by `php artisan db:seed`, all with password `password`:
+Seeded by `php artisan db:seed`. The password for all of them is `password`.
 
 | Role | Email |
 |---|---|
@@ -101,7 +93,7 @@ Seeded by `php artisan db:seed`, all with password `password`:
 
 ## Local setup (no Docker)
 
-Requires PHP 8.3+, Composer, Node 22+, and a local PostgreSQL instance.
+You'll need PHP 8.3+, Composer, Node 22+, and a local PostgreSQL instance.
 
 ```bash
 composer install
@@ -111,46 +103,47 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Edit `.env` to point at your Postgres instance (`DB_HOST`, `DB_PORT`, `DB_DATABASE`,
-`DB_USERNAME`, `DB_PASSWORD`), then create the database and role, e.g.:
+Point `.env` at your Postgres instance (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`,
+`DB_PASSWORD`), then create the database and role:
 
 ```bash
 psql -U postgres -c "CREATE ROLE custodia WITH LOGIN PASSWORD 'custodia_local_dev' CREATEDB;"
 psql -U postgres -c "CREATE DATABASE custodia OWNER custodia;"
 ```
 
-Run migrations and seed demo data:
+Migrate and seed:
 
 ```bash
 php artisan migrate --seed
 ```
 
-Start the app (Laravel + Vite together):
+Then start Laravel and Vite together:
 
 ```bash
 composer run dev
 ```
 
-Visit `http://localhost:8010`. `SANCTUM_STATEFUL_DOMAINS` in `.env` must include whatever
-host:port you're serving on (`localhost:8010,127.0.0.1:8010` by default) — Sanctum's SPA cookie
-auth silently no-ops otherwise.
+The app is at `http://localhost:8010`. One thing worth knowing: `SANCTUM_STATEFUL_DOMAINS` in
+`.env` has to include whatever host and port you're actually serving on
+(`localhost:8010,127.0.0.1:8010` by default). If it doesn't, Sanctum's cookie auth fails
+silently and you'll spend a while wondering why login does nothing.
 
 ## Docker
 
-A `docker-compose.yml` and `Dockerfile` are included (Postgres + a PHP-FPM-free `php artisan
-serve` container, with the frontend built into the image at build time). To run:
+There's a `docker-compose.yml` and `Dockerfile` (Postgres, plus a container running
+`php artisan serve` with the frontend built into the image).
 
 ```bash
 APP_KEY=$(php artisan key:generate --show) docker compose up --build
 ```
 
-Then in a separate terminal, migrate and seed:
+Then seed it in another terminal:
 
 ```bash
 docker compose exec app php artisan db:seed
 ```
 
-The app runs on `http://localhost:8000`.
+This one runs on `http://localhost:8000`.
 
 ## Tests
 
@@ -158,27 +151,30 @@ The app runs on `http://localhost:8000`.
 ./vendor/bin/pest
 ```
 
-184 feature tests covering authentication and RBAC, prisoner CRUD, housing assignment history,
-the admission and release workflows, incidents, medical access restrictions, visits, movements,
-sentences, cross-cutting permission checks, and a security regression suite (login throttling,
-cell capacity enforcement, state-machine guards, audit integrity). Tests run against a dedicated
-`custodia_test` Postgres database (configured in `phpunit.xml`) rather than SQLite, since the
-prisoner search endpoint uses Postgres's `ILIKE`.
+184 feature tests. They cover authentication and role permissions, prisoner CRUD, housing
+assignment history, the admission and release workflows, incidents, medical access
+restrictions, visits, movements and sentences. There's also a security regression suite
+covering login throttling, cell capacity enforcement, workflow state guards and audit
+integrity, which came out of an audit pass over the whole codebase.
+
+Tests run against a dedicated `custodia_test` Postgres database configured in `phpunit.xml`
+rather than SQLite, because the prisoner search uses Postgres's `ILIKE`.
 
 ## Architecture notes
 
-- **Controller → Service → Model.** Business logic — sequential number generation, status
-  transitions, the close-old/open-new housing assignment swap — lives in `app/Services/`.
-  Controllers stay thin: authorize, delegate to a service, return a Resource. No controller
-  touches `AuditService` directly.
-- **Audit logging inside the transaction.** Each service method opens its own
-  `DB::transaction()` and writes its audit entry within it. The state change and the record of
-  who made it commit together or not at all, so the log can't drift from reality.
-- **Housing history over a foreign key.** `housing_assignments` carries `started_at`/`ended_at`,
-  so a prisoner's full cell history is a query rather than a reconstruction.
-- **Derived occupancy.** Cell, wing and block occupancy is counted from active assignments
-  instead of being stored on a row that would need to be kept in sync.
-- **Backed enums everywhere.** Statuses and types are PHP backed enums cast on the model, not
-  loose strings, so invalid states fail at the boundary.
-- **Resources, never raw models.** Every endpoint returns an API Resource, so the JSON shape is
-  explicit and internal columns don't leak.
+Business logic lives in `app/Services/`, not in controllers or models. Sequential number
+generation, status transitions and the close-old/open-new housing assignment swap all happen
+there. Controllers authorize, call a service, and return a Resource. No controller touches
+`AuditService` directly.
+
+Each service method opens its own `DB::transaction()` and writes its audit entry inside it.
+That's deliberate: if the audit write and the state change could commit separately, the log
+would eventually start lying, which defeats the point of having one.
+
+A few other decisions worth calling out. Housing assignments carry `started_at`/`ended_at` so
+a prisoner's cell history is a query instead of something you have to reconstruct. Cell, wing
+and block occupancy is counted from active assignments rather than stored on a column that
+would need keeping in sync. Statuses and types are PHP backed enums cast on the model, so an
+invalid state fails at the boundary instead of somewhere further in. Every endpoint returns an
+API Resource, so the JSON shape is explicit and database columns don't leak into responses by
+accident.
