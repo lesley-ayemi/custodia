@@ -21,9 +21,11 @@ class PropertyItemResource extends JsonResource
             'description' => $this->description,
             'quantity' => $this->quantity,
             'storage_location' => $this->storage_location,
+            'notes' => $this->notes,
             'received_by' => $this->whenLoaded('receivedBy', fn () => $this->receivedBy->name),
             'received_at' => $this->received_at->toIso8601String(),
             'released_by' => $this->whenLoaded('releasedBy', fn () => $this->releasedBy?->name),
+            'released_to' => $this->released_to,
             'released_at' => $this->released_at?->toIso8601String(),
         ];
     }

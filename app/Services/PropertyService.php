@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class PropertyService
 {
     /**
-     * @param  array<int, array{description: string, quantity: int, storage_location: string}>  $items
+     * @param  array<int, array{description: string, quantity?: int, storage_location: string, notes?: string|null}>  $items
      * @return Collection<int, PropertyItem>
      */
     public function receiveBag(Prisoner $prisoner, array $items, User $receivedBy): Collection
@@ -28,6 +28,7 @@ class PropertyService
                     'description' => $item['description'],
                     'quantity' => $item['quantity'] ?? 1,
                     'storage_location' => $item['storage_location'],
+                    'notes' => $item['notes'] ?? null,
                     'received_by' => $receivedBy->id,
                     'received_at' => $receivedAt,
                 ]);
@@ -37,9 +38,10 @@ class PropertyService
         });
     }
 
-    public function releaseItem(PropertyItem $item, User $releasedBy): PropertyItem
+    public function releaseItem(PropertyItem $item, User $releasedBy, string $releasedTo): PropertyItem
     {
         $item->released_by = $releasedBy->id;
+        $item->released_to = $releasedTo;
         $item->released_at = now();
         $item->save();
 

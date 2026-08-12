@@ -23,8 +23,8 @@ export const usePropertyStore = defineStore('property', () => {
         return response.data;
     }
 
-    async function release(itemId: number): Promise<PropertyItem> {
-        const response = await api.post<PropertyItem>(`/api/property-items/${itemId}/release`);
+    async function release(itemId: number, releasedTo: string): Promise<PropertyItem> {
+        const response = await api.post<PropertyItem>(`/api/property-items/${itemId}/release`, { released_to: releasedTo });
         return response.data;
     }
 

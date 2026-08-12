@@ -22,6 +22,7 @@ class StorePropertyBagRequest extends FormRequest
             'items.*.description' => ['required', 'string', 'max:255'],
             'items.*.quantity' => ['nullable', 'integer', 'min:1', 'max:99'],
             'items.*.storage_location' => ['required', 'string', 'max:255'],
+            'items.*.notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

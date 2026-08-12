@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ReleasePropertyItemRequest;
 use App\Http\Requests\StorePropertyBagRequest;
 use App\Http\Resources\PropertyItemResource;
 use App\Models\Prisoner;
@@ -10,7 +11,6 @@ use App\Models\PropertyItem;
 use App\Services\AuditService;
 use App\Services\PropertyService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class PropertyItemController extends Controller
@@ -41,15 +41,14 @@ class PropertyItemController extends Controller
         return PropertyItemResource::collection($items)->response()->setStatusCode(201);
     }
 
-    public function release(Request $request, PropertyItem $propertyItem): PropertyItemResource
+    public function release(ReleasePropertyItemRequest $request, PropertyItem $propertyItem): PropertyItemResource
     {
-        $this->authorize('release', $propertyItem);
-
-        $this->property->releaseItem($propertyItem, $request->user());
+        $this->property->releaseItem($propertyItem, $request->user(), $request->validated('released_to'));
 
         $this->audit->log($request->user(), 'released property', $propertyItem, newValues: [
             'property_number' => $propertyItem->property_number,
             'description' => $propertyItem->description,
+            'released_to' => $propertyItem->released_to,
         ]);
 
         return new PropertyItemResource($propertyItem->load('receivedBy', 'releasedBy'));

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'description',
     'quantity',
     'storage_location',
+    'notes',
     'received_by',
     'received_at',
 ])]
