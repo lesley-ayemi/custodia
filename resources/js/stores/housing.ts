@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import api from '../services/api';
-import type { Block, CellSummary, HousingAssignment } from '../types/housing';
+import type { Block, CellSummary, HousingAssignment, Wing } from '../types/housing';
 
 export const useHousingStore = defineStore('housing', () => {
     const blocks = ref<Block[]>([]);
@@ -45,8 +45,22 @@ export const useHousingStore = defineStore('housing', () => {
         await api.delete(`/api/blocks/${id}`);
     }
 
-    async function createCell(blockId: number, code: string, capacity: number): Promise<CellSummary> {
-        const response = await api.post<CellSummary>('/api/cells', { block_id: blockId, code, capacity });
+    async function createWing(blockId: number, name: string): Promise<Wing> {
+        const response = await api.post<Wing>('/api/wings', { block_id: blockId, name });
+        return response.data;
+    }
+
+    async function renameWing(id: number, name: string): Promise<Wing> {
+        const response = await api.put<Wing>(`/api/wings/${id}`, { name });
+        return response.data;
+    }
+
+    async function deleteWing(id: number): Promise<void> {
+        await api.delete(`/api/wings/${id}`);
+    }
+
+    async function createCell(wingId: number, code: string, capacity: number): Promise<CellSummary> {
+        const response = await api.post<CellSummary>('/api/cells', { wing_id: wingId, code, capacity });
         return response.data;
     }
 
@@ -68,6 +82,9 @@ export const useHousingStore = defineStore('housing', () => {
         createBlock,
         renameBlock,
         deleteBlock,
+        createWing,
+        renameWing,
+        deleteWing,
         createCell,
         updateCell,
         deleteCell,

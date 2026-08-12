@@ -23,14 +23,14 @@ class HousingAssignmentController extends Controller
 
         $assignment = $this->housing->assign($prisoner, $cell, $request->user());
 
-        return new HousingAssignmentResource($assignment->load('cell.block', 'assignedBy'));
+        return new HousingAssignmentResource($assignment->load('cell.wing.block', 'assignedBy'));
     }
 
     public function history(Prisoner $prisoner): AnonymousResourceCollection
     {
         $this->authorize('view', $prisoner);
 
-        $history = $prisoner->housingAssignments()->with('cell.block', 'assignedBy')->get();
+        $history = $prisoner->housingAssignments()->with('cell.wing.block', 'assignedBy')->get();
 
         return HousingAssignmentResource::collection($history);
     }

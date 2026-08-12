@@ -4,15 +4,17 @@ use App\Enums\PrisonerStatus;
 use App\Enums\Role;
 use App\Models\Block;
 use App\Models\Cell;
+use App\Models\Facility;
 use App\Models\Prisoner;
 use App\Models\ReleaseReview;
 use App\Models\User;
 
 function makeReleaseCell(): Cell
 {
-    $block = Block::create(['name' => 'Release Test Block']);
+    $block = Block::create(['name' => 'Release Test Block', 'facility_id' => Facility::first()->id]);
+    $wing = $block->wings()->create(['name' => 'Wing 1']);
 
-    return $block->cells()->create(['code' => 'RTB-101', 'capacity' => 2]);
+    return $wing->cells()->create(['code' => 'RTB-101', 'capacity' => 2]);
 }
 
 test('an officer can schedule a release review for a prisoner in custody', function () {

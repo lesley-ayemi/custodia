@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Enums\PrisonerStatus;
 use App\Enums\Role;
 use App\Models\Block;
-use App\Models\Cell;
+use App\Models\Facility;
 use App\Models\Prisoner;
 use App\Models\User;
 use App\Services\HousingService;
@@ -29,14 +29,21 @@ class HousingSeeder extends Seeder
      */
     public function run(): void
     {
+        $facilityId = Facility::firstOrCreate(['name' => 'HMP Custodia'])->id;
         $cells = [];
 
         foreach ($this->layout as $blockName => $config) {
-            $block = Block::create(['name' => $blockName]);
+            $block = Block::create(['name' => $blockName, 'facility_id' => $facilityId]);
             $prefix = strtoupper(substr($blockName, -1));
 
+            $wingOne = $block->wings()->create(['name' => 'Wing 1']);
+            $wingTwo = $block->wings()->create(['name' => 'Wing 2']);
+            $midpoint = (int) ceil($config['cells'] / 2);
+
             for ($i = 1; $i <= $config['cells']; $i++) {
-                $cells[] = $block->cells()->create([
+                $wing = $i <= $midpoint ? $wingOne : $wingTwo;
+
+                $cells[] = $wing->cells()->create([
                     'code' => sprintf('%s-%03d', $prefix, 100 + $i),
                     'capacity' => $config['capacity'],
                 ]);

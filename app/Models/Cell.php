@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['block_id', 'code', 'capacity'])]
+#[Fillable(['wing_id', 'code', 'capacity'])]
 class Cell extends Model
 {
-    public function block(): BelongsTo
+    public function wing(): BelongsTo
     {
-        return $this->belongsTo(Block::class);
+        return $this->belongsTo(Wing::class);
     }
 
     public function housingAssignments(): HasMany

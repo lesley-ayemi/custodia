@@ -31,7 +31,9 @@ const assigning = ref(false);
 const selectedCellId = ref<number | null>(null);
 
 const availableCells = computed(() =>
-    housingStore.blocks.flatMap((block) => block.cells.map((cell) => ({ ...cell, blockName: block.name }))).filter((cell) => cell.available > 0),
+    housingStore.blocks
+        .flatMap((block) => block.wings.flatMap((wing) => wing.cells.map((cell) => ({ ...cell, blockName: block.name, wingName: wing.name }))))
+        .filter((cell) => cell.available > 0),
 );
 
 const canSeeCustodyOperations = computed(() => auth.hasRole('admin', 'officer', 'supervisor'));
@@ -117,7 +119,7 @@ onMounted(load);
                 <div class="rounded-lg border border-slate-200 bg-white p-6">
                     <h2 class="text-sm font-semibold text-slate-700">Current cell</h2>
                     <p v-if="prisoner.current_cell" class="mt-2 text-lg font-medium text-slate-900">
-                        {{ prisoner.current_cell.block_name }} / {{ prisoner.current_cell.cell_code }}
+                        {{ prisoner.current_cell.block_name }} / {{ prisoner.current_cell.wing_name }} / {{ prisoner.current_cell.cell_code }}
                     </p>
                     <p v-else class="mt-2 text-sm text-slate-500">Not currently housed.</p>
 
@@ -125,7 +127,7 @@ onMounted(load);
                         <select v-model="selectedCellId" class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
                             <option :value="null">Select a cell…</option>
                             <option v-for="cell in availableCells" :key="cell.id" :value="cell.id">
-                                {{ cell.blockName }} / {{ cell.code }} ({{ cell.available }} free)
+                                {{ cell.blockName }} / {{ cell.wingName }} / {{ cell.code }} ({{ cell.available }} free)
                             </option>
                         </select>
                         <button

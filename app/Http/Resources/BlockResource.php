@@ -17,12 +17,16 @@ class BlockResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'cells' => $this->cells->map(fn ($cell) => [
-                'id' => $cell->id,
-                'code' => $cell->code,
-                'capacity' => $cell->capacity,
-                'occupancy' => $cell->occupancy(),
-                'available' => $cell->availableBeds(),
+            'wings' => $this->wings->map(fn ($wing) => [
+                'id' => $wing->id,
+                'name' => $wing->name,
+                'cells' => $wing->cells->map(fn ($cell) => [
+                    'id' => $cell->id,
+                    'code' => $cell->code,
+                    'capacity' => $cell->capacity,
+                    'occupancy' => $cell->occupancy(),
+                    'available' => $cell->availableBeds(),
+                ]),
             ]),
         ];
     }

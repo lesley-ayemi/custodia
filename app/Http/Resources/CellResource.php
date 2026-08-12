@@ -16,7 +16,10 @@ class CellResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'block_id' => $this->block_id,
+            'wing_id' => $this->wing_id,
+            'wing_name' => $this->wing->name,
+            'block_id' => $this->wing->block_id,
+            'block_name' => $this->wing->block->name,
             'code' => $this->code,
             'capacity' => $this->capacity,
             'occupancy' => $this->occupancy(),

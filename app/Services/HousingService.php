@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\Block;
 use App\Models\Cell;
+use App\Models\Facility;
 use App\Models\HousingAssignment;
 use App\Models\Prisoner;
 use App\Models\User;
+use App\Models\Wing;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -48,6 +50,8 @@ class HousingService
     public function createBlock(array $data, User $actor): Block
     {
         return DB::transaction(function () use ($data, $actor) {
+            $data['facility_id'] = Facility::query()->firstOrFail()->id;
+
             $block = Block::create($data);
 
             $this->audit->log($actor, 'created', $block, newValues: ['name' => $block->name]);
@@ -75,9 +79,9 @@ class HousingService
     public function deleteBlock(Block $block, User $actor): void
     {
         DB::transaction(function () use ($block, $actor) {
-            if ($block->cells()->exists()) {
+            if ($block->wings()->exists()) {
                 throw ValidationException::withMessages([
-                    'block' => 'Delete or move all cells out of this block first.',
+                    'block' => 'Delete or move all wings out of this block first.',
                 ]);
             }
 
@@ -86,6 +90,53 @@ class HousingService
             $block->delete();
 
             $this->audit->log($actor, 'deleted', $block, oldValues: ['name' => $name]);
+        });
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function createWing(array $data, User $actor): Wing
+    {
+        return DB::transaction(function () use ($data, $actor) {
+            $wing = Wing::create($data);
+
+            $this->audit->log($actor, 'created', $wing, newValues: ['name' => $wing->name, 'block_id' => $wing->block_id]);
+
+            return $wing;
+        });
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function updateWing(Wing $wing, array $data, User $actor): Wing
+    {
+        return DB::transaction(function () use ($wing, $data, $actor) {
+            $oldValues = $wing->only(array_keys($data));
+
+            $wing->update($data);
+
+            $this->audit->log($actor, 'updated', $wing, oldValues: $oldValues, newValues: $data);
+
+            return $wing;
+        });
+    }
+
+    public function deleteWing(Wing $wing, User $actor): void
+    {
+        DB::transaction(function () use ($wing, $actor) {
+            if ($wing->cells()->exists()) {
+                throw ValidationException::withMessages([
+                    'wing' => 'Delete or move all cells out of this wing first.',
+                ]);
+            }
+
+            $name = $wing->name;
+
+            $wing->delete();
+
+            $this->audit->log($actor, 'deleted', $wing, oldValues: ['name' => $name]);
         });
     }
 

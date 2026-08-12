@@ -3,14 +3,16 @@
 use App\Enums\Role;
 use App\Models\Block;
 use App\Models\Cell;
+use App\Models\Facility;
 use App\Models\Prisoner;
 use App\Models\User;
 
 function makeCell(string $blockName = 'Block A', string $code = 'A-101', int $capacity = 2): Cell
 {
-    $block = Block::create(['name' => $blockName]);
+    $block = Block::create(['name' => $blockName, 'facility_id' => Facility::first()->id]);
+    $wing = $block->wings()->create(['name' => 'Wing 1']);
 
-    return $block->cells()->create(['code' => $code, 'capacity' => $capacity]);
+    return $wing->cells()->create(['code' => $code, 'capacity' => $capacity]);
 }
 
 test('an officer can assign a prisoner to a cell', function () {

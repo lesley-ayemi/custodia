@@ -18,7 +18,7 @@ class StoreCellRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'block_id' => ['required', 'integer', 'exists:blocks,id'],
+            'wing_id' => ['required', 'integer', 'exists:wings,id'],
             'code' => ['required', 'string', 'max:50', 'unique:cells,code'],
             'capacity' => ['required', 'integer', 'min:1', 'max:20'],
         ];

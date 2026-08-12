@@ -16,7 +16,8 @@ class HousingAssignmentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'block_name' => $this->cell->block->name,
+            'block_name' => $this->cell->wing->block->name,
+            'wing_name' => $this->cell->wing->name,
             'cell_code' => $this->cell->code,
             'assigned_by' => $this->assignedBy->name,
             'started_at' => $this->started_at->toIso8601String(),

@@ -23,7 +23,7 @@ class BlockController extends Controller
     {
         $this->authorize('viewAny', Cell::class);
 
-        $blocks = Block::with('cells')->orderBy('name')->get();
+        $blocks = Block::with('wings.cells')->orderBy('name')->get();
 
         return BlockResource::collection($blocks);
     }
@@ -32,14 +32,14 @@ class BlockController extends Controller
     {
         $block = $this->housing->createBlock($request->validated(), $request->user());
 
-        return new BlockResource($block->loadMissing('cells'));
+        return new BlockResource($block->loadMissing('wings.cells'));
     }
 
     public function update(UpdateBlockRequest $request, Block $block): BlockResource
     {
         $this->housing->updateBlock($block, $request->validated(), $request->user());
 
-        return new BlockResource($block->loadMissing('cells'));
+        return new BlockResource($block->loadMissing('wings.cells'));
     }
 
     public function destroy(Request $request, Block $block): Response

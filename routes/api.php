@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VisitController;
 use App\Http\Controllers\Api\VisitorController;
 use App\Http\Controllers\Api\VisitRequestController;
+use App\Http\Controllers\Api\WingController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -40,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/prisoners/{prisoner}/housing-history', [HousingAssignmentController::class, 'history']);
 
     Route::apiResource('blocks', BlockController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::apiResource('wings', WingController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('cells', CellController::class)->only(['store', 'update', 'destroy']);
     Route::post('/housing-assignments', [HousingAssignmentController::class, 'store']);
 
