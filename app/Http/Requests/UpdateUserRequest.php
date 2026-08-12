@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Role;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,5 +25,18 @@ class UpdateUserRequest extends FormRequest
             'password' => ['nullable', 'string', 'min:8'],
             'role' => ['sometimes', 'required', 'in:admin,officer,supervisor,medical'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $target = $this->route('user');
+
+            // Stops the last admin standing from demoting themselves and
+            // locking everyone out of staff management.
+            if ($this->user()->is($target) && $this->filled('role') && $this->input('role') !== Role::Admin->value) {
+                $validator->errors()->add('role', 'You cannot change your own role.');
+            }
+        });
     }
 }

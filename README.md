@@ -158,11 +158,12 @@ The app runs on `http://localhost:8000`.
 ./vendor/bin/pest
 ```
 
-174 feature tests covering authentication and RBAC, prisoner CRUD, housing assignment history,
+184 feature tests covering authentication and RBAC, prisoner CRUD, housing assignment history,
 the admission and release workflows, incidents, medical access restrictions, visits, movements,
-sentences, and cross-cutting permission checks. Tests run against a dedicated `custodia_test`
-Postgres database (configured in `phpunit.xml`) rather than SQLite, since the prisoner search
-endpoint uses Postgres's `ILIKE`.
+sentences, cross-cutting permission checks, and a security regression suite (login throttling,
+cell capacity enforcement, state-machine guards, audit integrity). Tests run against a dedicated
+`custodia_test` Postgres database (configured in `phpunit.xml`) rather than SQLite, since the
+prisoner search endpoint uses Postgres's `ILIKE`.
 
 ## Architecture notes
 

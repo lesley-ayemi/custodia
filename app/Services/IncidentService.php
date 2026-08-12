@@ -7,6 +7,7 @@ use App\Models\Incident;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class IncidentService
 {
@@ -63,23 +64,55 @@ class IncidentService
         });
     }
 
-    public function markUnderReview(Incident $incident): Incident
+    public function markUnderReview(Incident $incident, User $actor): Incident
     {
-        $incident->status = IncidentStatus::UnderReview;
-        $incident->save();
+        return DB::transaction(function () use ($incident, $actor) {
+            if ($incident->status !== IncidentStatus::Reported) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only a reported incident can be moved under review.',
+                ]);
+            }
 
-        return $incident;
+            $previousStatus = $incident->status->value;
+
+            $incident->status = IncidentStatus::UnderReview;
+            $incident->save();
+
+            $this->audit->log(
+                $actor,
+                'moved under review',
+                $incident,
+                oldValues: ['status' => $previousStatus],
+                newValues: ['status' => $incident->status->value],
+            );
+
+            return $incident;
+        });
     }
 
     public function resolve(Incident $incident, User $resolvedBy): Incident
     {
         return DB::transaction(function () use ($incident, $resolvedBy) {
+            if ($incident->status !== IncidentStatus::UnderReview) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only an incident under review can be resolved.',
+                ]);
+            }
+
+            $previousStatus = $incident->status->value;
+
             $incident->status = IncidentStatus::Resolved;
             $incident->resolved_by = $resolvedBy->id;
             $incident->resolved_at = now();
             $incident->save();
 
-            $this->audit->log($resolvedBy, 'resolved', $incident, oldValues: ['status' => 'under_review'], newValues: ['status' => 'resolved']);
+            $this->audit->log(
+                $resolvedBy,
+                'resolved',
+                $incident,
+                oldValues: ['status' => $previousStatus],
+                newValues: ['status' => $incident->status->value],
+            );
 
             return $incident;
         });

@@ -21,7 +21,18 @@ class HousingService
     public function assign(Prisoner $prisoner, Cell $cell, User $assignedBy): HousingAssignment
     {
         return DB::transaction(function () use ($prisoner, $cell, $assignedBy) {
+            // Lock the row so two concurrent assignments can't both read the same
+            // free-bed count and overfill the cell between the check and the insert.
+            $cell = Cell::whereKey($cell->getKey())->lockForUpdate()->firstOrFail();
+
             $previousCell = $prisoner->currentHousing?->cell?->code;
+            $alreadyInCell = $prisoner->currentHousing?->cell_id === $cell->id;
+
+            if (! $alreadyInCell && $cell->availableBeds() < 1) {
+                throw ValidationException::withMessages([
+                    'cell_id' => "Cell {$cell->code} is already at capacity ({$cell->capacity}).",
+                ]);
+            }
 
             $prisoner->housingAssignments()->whereNull('ended_at')->update(['ended_at' => now()]);
 

@@ -70,7 +70,7 @@ class IncidentController extends Controller
     {
         $this->authorize('review', $incident);
 
-        $this->incidents->markUnderReview($incident);
+        $this->incidents->markUnderReview($incident, $request->user());
 
         return new IncidentResource($incident->load('prisoner', 'officer', 'resolvedBy'));
     }

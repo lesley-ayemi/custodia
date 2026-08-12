@@ -19,7 +19,7 @@ class StoreVisitorRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'date_of_birth' => ['required', 'date'],
+            'date_of_birth' => ['required', 'date', 'before:today'],
             'id_type' => ['required', 'in:passport,driving_licence,national_id,other'],
             'id_number' => ['required', 'string', 'max:100'],
             'phone' => ['required', 'string', 'max:50'],

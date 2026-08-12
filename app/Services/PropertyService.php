@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class PropertyService
 {
@@ -52,6 +53,12 @@ class PropertyService
     public function releaseItem(PropertyItem $item, User $releasedBy, string $releasedTo): PropertyItem
     {
         return DB::transaction(function () use ($item, $releasedBy, $releasedTo) {
+            if ($item->released_at !== null) {
+                throw ValidationException::withMessages([
+                    'released_at' => "This item was already released to {$item->released_to}.",
+                ]);
+            }
+
             $item->released_by = $releasedBy->id;
             $item->released_to = $releasedTo;
             $item->released_at = now();

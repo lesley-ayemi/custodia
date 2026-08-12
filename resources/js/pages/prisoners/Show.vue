@@ -30,6 +30,7 @@ const history = ref<HousingAssignment[]>([]);
 const archiving = ref(false);
 const assigning = ref(false);
 const selectedCellId = ref<number | null>(null);
+const housingError = ref<string | null>(null);
 
 const availableCells = computed(() =>
     housingStore.blocks
@@ -66,14 +67,24 @@ async function archive(): Promise<void> {
     }
 }
 
+function extractError(err: unknown): string {
+    const response = (err as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } }).response;
+    const errors = response?.data?.errors;
+    if (errors) return Object.values(errors).flat().join(' ');
+    return response?.data?.message ?? 'Something went wrong.';
+}
+
 async function assignCell(): Promise<void> {
     if (!prisoner.value || !selectedCellId.value) return;
     assigning.value = true;
+    housingError.value = null;
 
     try {
         await housingStore.assign(prisoner.value.id, selectedCellId.value);
         selectedCellId.value = null;
         await load();
+    } catch (err) {
+        housingError.value = extractError(err);
     } finally {
         assigning.value = false;
     }
@@ -140,6 +151,10 @@ onMounted(load);
                             {{ assigning ? 'Assigning…' : 'Assign' }}
                         </button>
                     </div>
+
+                    <p v-if="housingError" class="mt-3 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+                        {{ housingError }}
+                    </p>
                 </div>
 
                 <div class="surface-card">
