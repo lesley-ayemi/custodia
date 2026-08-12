@@ -96,6 +96,24 @@ const router = createRouter({
             meta: { requiresAuth: true, roles: ['admin', 'officer', 'supervisor'] },
         },
         {
+            path: '/admissions',
+            name: 'admissions.index',
+            component: () => import('../pages/admissions/Index.vue'),
+            meta: { requiresAuth: true, roles: ['admin', 'officer', 'supervisor'] },
+        },
+        {
+            path: '/admissions/create',
+            name: 'admissions.create',
+            component: () => import('../pages/admissions/Create.vue'),
+            meta: { requiresAuth: true, roles: ['officer', 'admin'] },
+        },
+        {
+            path: '/admissions/:id',
+            name: 'admissions.show',
+            component: () => import('../pages/admissions/Show.vue'),
+            meta: { requiresAuth: true, roles: ['admin', 'officer', 'supervisor', 'medical'] },
+        },
+        {
             path: '/incidents/create',
             name: 'incidents.create',
             component: () => import('../pages/incidents/Create.vue'),

@@ -111,4 +111,9 @@ class Prisoner extends Model
     {
         return $this->hasMany(Movement::class)->orderByDesc('scheduled_at');
     }
+
+    public function admissions(): HasMany
+    {
+        return $this->hasMany(Admission::class)->orderByDesc('admission_date');
+    }
 }

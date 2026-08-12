@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdmissionController;
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlockController;
@@ -123,4 +124,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/movements/{movement}/arrive', [MovementController::class, 'arrive']);
     Route::post('/movements/{movement}/return', [MovementController::class, 'markReturned']);
     Route::post('/movements/{movement}/cancel', [MovementController::class, 'cancel']);
+
+    Route::get('/admissions', [AdmissionController::class, 'index']);
+    Route::get('/admissions/{admission}', [AdmissionController::class, 'show']);
+    Route::post('/admissions', [AdmissionController::class, 'store']);
+    Route::post('/admissions/{admission}/legal-authority', [AdmissionController::class, 'recordLegalAuthority']);
+    Route::post('/admissions/{admission}/assessment', [AdmissionController::class, 'recordInitialAssessment']);
+    Route::post('/admissions/{admission}/classification', [AdmissionController::class, 'recordSecurityClassification']);
+    Route::post('/admissions/{admission}/advance-to-medical', [AdmissionController::class, 'advanceToMedicalScreening']);
+    Route::post('/admissions/{admission}/complete-medical', [AdmissionController::class, 'completeMedicalScreening']);
+    Route::post('/admissions/{admission}/complete-housing', [AdmissionController::class, 'completeHousingAssignment']);
 });

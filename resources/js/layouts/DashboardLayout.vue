@@ -56,6 +56,14 @@ async function logout(): Promise<void> {
                             Movements
                         </router-link>
                         <router-link
+                            v-if="auth.hasRole('admin', 'officer', 'supervisor')"
+                            :to="{ name: 'admissions.index' }"
+                            class="hover:text-slate-900"
+                            active-class="font-semibold text-slate-900"
+                        >
+                            Admissions
+                        </router-link>
+                        <router-link
                             v-if="auth.hasRole('medical', 'admin')"
                             :to="{ name: 'medical.index' }"
                             class="hover:text-slate-900"
