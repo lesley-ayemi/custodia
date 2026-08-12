@@ -11,6 +11,7 @@ import ReleaseReviewPanel from '../../components/ReleaseReviewPanel.vue';
 import MedicalAlertsPanel from '../../components/MedicalAlertsPanel.vue';
 import MedicalPanel from '../../components/MedicalPanel.vue';
 import VisitsPanel from '../../components/VisitsPanel.vue';
+import MovementsPanel from '../../components/MovementsPanel.vue';
 import { usePrisonerStore } from '../../stores/prisoner';
 import { useHousingStore } from '../../stores/housing';
 import { useAuthStore } from '../../stores/auth';
@@ -152,6 +153,10 @@ onMounted(load);
 
             <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">
                 <VisitsPanel :prisoner-id="prisoner.id" />
+            </div>
+
+            <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">
+                <MovementsPanel :prisoner-id="prisoner.id" />
             </div>
 
             <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">

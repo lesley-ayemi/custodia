@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\LegalRepresentativeController;
 use App\Http\Controllers\Api\MedicalAlertController;
 use App\Http\Controllers\Api\MedicalAppointmentController;
 use App\Http\Controllers\Api\MedicalRecordController;
+use App\Http\Controllers\Api\MovementController;
 use App\Http\Controllers\Api\PrescriptionController;
 use App\Http\Controllers\Api\PrisonerController;
 use App\Http\Controllers\Api\ProgrammeAttendanceController;
@@ -111,4 +112,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/visits/{visit}/check-in', [VisitController::class, 'checkIn']);
     Route::post('/visits/{visit}/check-out', [VisitController::class, 'checkOut']);
     Route::post('/visits/{visit}/cancel', [VisitController::class, 'cancel']);
+
+    Route::get('/movements/upcoming', [MovementController::class, 'upcoming']);
+    Route::get('/prisoners/{prisoner}/movements', [MovementController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/movements', [MovementController::class, 'store']);
+    Route::post('/movements/{movement}/approve', [MovementController::class, 'approve']);
+    Route::post('/movements/{movement}/depart', [MovementController::class, 'depart']);
+    Route::post('/movements/{movement}/arrive', [MovementController::class, 'arrive']);
+    Route::post('/movements/{movement}/return', [MovementController::class, 'markReturned']);
+    Route::post('/movements/{movement}/cancel', [MovementController::class, 'cancel']);
 });

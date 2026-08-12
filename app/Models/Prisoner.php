@@ -106,4 +106,9 @@ class Prisoner extends Model
     {
         return $this->hasMany(Visit::class)->orderByDesc('scheduled_at');
     }
+
+    public function movements(): HasMany
+    {
+        return $this->hasMany(Movement::class)->orderByDesc('scheduled_at');
+    }
 }
