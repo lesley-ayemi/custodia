@@ -11,7 +11,6 @@ use App\Http\Requests\RecordReleaseStepRequest;
 use App\Http\Resources\ReleaseReviewResource;
 use App\Models\Prisoner;
 use App\Models\ReleaseReview;
-use App\Services\AuditService;
 use App\Services\ReleaseService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -22,7 +21,6 @@ class ReleaseReviewController extends Controller
 
     public function __construct(
         protected ReleaseService $releases,
-        protected AuditService $audit,
     ) {}
 
     public function index(Request $request): AnonymousResourceCollection
@@ -53,10 +51,6 @@ class ReleaseReviewController extends Controller
     {
         $review = $this->releases->initiate($prisoner, $request->user());
 
-        $this->audit->log($request->user(), 'scheduled release', $review, newValues: [
-            'prisoner' => $prisoner->fullName(),
-        ]);
-
         return new ReleaseReviewResource($review->load(self::RELATIONS));
     }
 
@@ -84,20 +78,12 @@ class ReleaseReviewController extends Controller
     {
         $this->releases->completeStep($releaseReview, ReleaseStep::SupervisorApproval, $request->user(), $request->validated('notes'));
 
-        $this->audit->log($request->user(), 'approved release', $releaseReview, newValues: ['step' => 'supervisor_approval']);
-
-        if ($releaseReview->fresh()->status->value === 'released') {
-            $this->audit->log($request->user(), 'released', $releaseReview->prisoner, oldValues: ['status' => 'in_custody'], newValues: ['status' => 'released']);
-        }
-
         return new ReleaseReviewResource($releaseReview->load(self::RELATIONS));
     }
 
     public function cancel(CancelReleaseReviewRequest $request, ReleaseReview $releaseReview): ReleaseReviewResource
     {
-        $this->releases->cancel($releaseReview, $request->validated('reason'));
-
-        $this->audit->log($request->user(), 'cancelled release review', $releaseReview, newValues: ['reason' => $releaseReview->cancellation_reason]);
+        $this->releases->cancel($releaseReview, $request->user(), $request->validated('reason'));
 
         return new ReleaseReviewResource($releaseReview->load(self::RELATIONS));
     }
@@ -105,8 +91,6 @@ class ReleaseReviewController extends Controller
     protected function recordStep(RecordReleaseStepRequest $request, ReleaseReview $releaseReview, ReleaseStep $step): ReleaseReviewResource
     {
         $this->releases->completeStep($releaseReview, $step, $request->user(), $request->validated('notes'));
-
-        $this->audit->log($request->user(), 'completed release step', $releaseReview, newValues: ['step' => $step->value]);
 
         return new ReleaseReviewResource($releaseReview->load(self::RELATIONS));
     }

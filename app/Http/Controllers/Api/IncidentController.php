@@ -7,7 +7,6 @@ use App\Http\Requests\StoreIncidentRequest;
 use App\Http\Requests\UpdateIncidentRequest;
 use App\Http\Resources\IncidentResource;
 use App\Models\Incident;
-use App\Services\AuditService;
 use App\Services\IncidentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -17,7 +16,6 @@ class IncidentController extends Controller
 {
     public function __construct(
         protected IncidentService $incidents,
-        protected AuditService $audit,
     ) {}
 
     public function index(Request $request): AnonymousResourceCollection
@@ -40,13 +38,7 @@ class IncidentController extends Controller
         $incident = $this->incidents->create([
             ...$request->validated(),
             'officer_id' => $request->user()->id,
-        ]);
-
-        $this->audit->log($request->user(), 'created', $incident, newValues: [
-            'incident_number' => $incident->incident_number,
-            'type' => $incident->type->value,
-            'severity' => $incident->severity->value,
-        ]);
+        ], $request->user());
 
         return new IncidentResource($incident->load('prisoner', 'officer'));
     }
@@ -60,11 +52,7 @@ class IncidentController extends Controller
 
     public function update(UpdateIncidentRequest $request, Incident $incident): IncidentResource
     {
-        $oldValues = $incident->only(array_keys($request->validated()));
-
-        $this->incidents->update($incident, $request->validated());
-
-        $this->audit->log($request->user(), 'updated', $incident, oldValues: $oldValues, newValues: $request->validated());
+        $this->incidents->update($incident, $request->validated(), $request->user());
 
         return new IncidentResource($incident->load('prisoner', 'officer', 'resolvedBy'));
     }
@@ -73,12 +61,7 @@ class IncidentController extends Controller
     {
         $this->authorize('delete', $incident);
 
-        $this->audit->log($request->user(), 'deleted', $incident, oldValues: [
-            'incident_number' => $incident->incident_number,
-            'status' => $incident->status->value,
-        ]);
-
-        $this->incidents->delete($incident);
+        $this->incidents->delete($incident, $request->user());
 
         return response()->noContent();
     }
@@ -97,8 +80,6 @@ class IncidentController extends Controller
         $this->authorize('review', $incident);
 
         $this->incidents->resolve($incident, $request->user());
-
-        $this->audit->log($request->user(), 'resolved', $incident, oldValues: ['status' => 'under_review'], newValues: ['status' => 'resolved']);
 
         return new IncidentResource($incident->load('prisoner', 'officer', 'resolvedBy'));
     }

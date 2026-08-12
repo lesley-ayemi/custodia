@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class PropertyService
 {
+    public function __construct(
+        protected AuditService $audit,
+    ) {}
+
     /**
      * @param  array<int, array{description: string, quantity?: int, storage_location: string, notes?: string|null}>  $items
      * @return Collection<int, PropertyItem>
@@ -21,7 +25,7 @@ class PropertyService
             $propertyNumber = $this->nextPropertyNumber();
             $receivedAt = now();
 
-            return collect($items)->map(function (array $item) use ($prisoner, $propertyNumber, $receivedBy, $receivedAt) {
+            $propertyItems = collect($items)->map(function (array $item) use ($prisoner, $propertyNumber, $receivedBy, $receivedAt) {
                 $propertyItem = PropertyItem::create([
                     'prisoner_id' => $prisoner->id,
                     'property_number' => $propertyNumber,
@@ -35,17 +39,32 @@ class PropertyService
 
                 return $propertyItem->setRelation('receivedBy', $receivedBy);
             });
+
+            $this->audit->log($receivedBy, 'received property', $prisoner, newValues: [
+                'property_number' => $propertyNumber,
+                'item_count' => $propertyItems->count(),
+            ]);
+
+            return $propertyItems;
         });
     }
 
     public function releaseItem(PropertyItem $item, User $releasedBy, string $releasedTo): PropertyItem
     {
-        $item->released_by = $releasedBy->id;
-        $item->released_to = $releasedTo;
-        $item->released_at = now();
-        $item->save();
+        return DB::transaction(function () use ($item, $releasedBy, $releasedTo) {
+            $item->released_by = $releasedBy->id;
+            $item->released_to = $releasedTo;
+            $item->released_at = now();
+            $item->save();
 
-        return $item;
+            $this->audit->log($releasedBy, 'released property', $item, newValues: [
+                'property_number' => $item->property_number,
+                'description' => $item->description,
+                'released_to' => $item->released_to,
+            ]);
+
+            return $item;
+        });
     }
 
     protected function nextPropertyNumber(): string

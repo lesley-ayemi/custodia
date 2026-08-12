@@ -7,7 +7,6 @@ use App\Http\Requests\StoreCourtHearingRequest;
 use App\Http\Resources\CourtHearingResource;
 use App\Models\CourtCase;
 use App\Models\CourtHearing;
-use App\Services\AuditService;
 use App\Services\CourtService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -15,7 +14,6 @@ class CourtHearingController extends Controller
 {
     public function __construct(
         protected CourtService $court,
-        protected AuditService $audit,
     ) {}
 
     public function upcoming(): AnonymousResourceCollection
@@ -34,12 +32,7 @@ class CourtHearingController extends Controller
 
     public function store(StoreCourtHearingRequest $request, CourtCase $courtCase): CourtHearingResource
     {
-        $hearing = $this->court->scheduleHearing($courtCase, $request->validated());
-
-        $this->audit->log($request->user(), 'scheduled hearing', $courtCase, newValues: [
-            'type' => $hearing->type->value,
-            'scheduled_at' => $hearing->scheduled_at->toIso8601String(),
-        ]);
+        $hearing = $this->court->scheduleHearing($courtCase, $request->validated(), $request->user());
 
         return new CourtHearingResource($hearing->load('courtCase.prisoner'));
     }

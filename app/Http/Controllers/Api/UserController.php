@@ -7,7 +7,6 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Services\AuditService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -19,7 +18,6 @@ class UserController extends Controller
 
     public function __construct(
         protected UserService $users,
-        protected AuditService $audit,
     ) {}
 
     public function index(Request $request): AnonymousResourceCollection
@@ -48,13 +46,7 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request): UserResource
     {
-        $user = $this->users->create($request->validated());
-
-        $this->audit->log($request->user(), 'created', $user, newValues: [
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->role->value,
-        ]);
+        $user = $this->users->create($request->validated(), $request->user());
 
         return new UserResource($user);
     }
@@ -68,12 +60,7 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user): UserResource
     {
-        $auditableChanges = $request->safe()->except('password');
-        $oldValues = $user->only(array_keys($auditableChanges));
-
-        $this->users->update($user, $request->validated());
-
-        $this->audit->log($request->user(), 'updated', $user, oldValues: $oldValues, newValues: $auditableChanges);
+        $this->users->update($user, $request->validated(), $request->user());
 
         return new UserResource($user);
     }
@@ -82,9 +69,7 @@ class UserController extends Controller
     {
         $this->authorize('delete', $user);
 
-        $this->audit->log($request->user(), 'deactivated', $user, oldValues: ['name' => $user->name, 'email' => $user->email]);
-
-        $this->users->deactivate($user);
+        $this->users->deactivate($user, $request->user());
 
         return response()->noContent();
     }

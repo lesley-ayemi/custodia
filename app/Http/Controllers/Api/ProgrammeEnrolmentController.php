@@ -9,7 +9,6 @@ use App\Http\Resources\ProgrammeEnrolmentResource;
 use App\Models\Prisoner;
 use App\Models\Programme;
 use App\Models\ProgrammeEnrolment;
-use App\Services\AuditService;
 use App\Services\ProgrammeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -18,7 +17,6 @@ class ProgrammeEnrolmentController extends Controller
 {
     public function __construct(
         protected ProgrammeService $programmes,
-        protected AuditService $audit,
     ) {}
 
     public function indexForPrisoner(Prisoner $prisoner): AnonymousResourceCollection
@@ -38,11 +36,6 @@ class ProgrammeEnrolmentController extends Controller
             'enrolled_at' => $request->validated('enrolled_at'),
         ]);
 
-        $this->audit->log($request->user(), 'enrolled', $enrolment, newValues: [
-            'programme' => $programme->name,
-            'prisoner' => $prisoner->fullName(),
-        ]);
-
         return new ProgrammeEnrolmentResource($enrolment->load('programme', 'enrolledBy', 'attendances'));
     }
 
@@ -50,21 +43,14 @@ class ProgrammeEnrolmentController extends Controller
     {
         $this->authorize('manage', $programmeEnrolment);
 
-        $this->programmes->complete($programmeEnrolment);
-
-        $this->audit->log($request->user(), 'completed', $programmeEnrolment, newValues: ['status' => 'completed']);
+        $this->programmes->complete($programmeEnrolment, $request->user());
 
         return new ProgrammeEnrolmentResource($programmeEnrolment->load('programme', 'enrolledBy', 'attendances'));
     }
 
     public function withdraw(WithdrawEnrolmentRequest $request, ProgrammeEnrolment $programmeEnrolment): ProgrammeEnrolmentResource
     {
-        $this->programmes->withdraw($programmeEnrolment, $request->validated('reason'));
-
-        $this->audit->log($request->user(), 'withdrew', $programmeEnrolment, newValues: [
-            'status' => 'withdrawn',
-            'reason' => $programmeEnrolment->withdrawal_reason,
-        ]);
+        $this->programmes->withdraw($programmeEnrolment, $request->user(), $request->validated('reason'));
 
         return new ProgrammeEnrolmentResource($programmeEnrolment->load('programme', 'enrolledBy', 'attendances'));
     }

@@ -7,7 +7,6 @@ use App\Http\Requests\StoreCourtCaseRequest;
 use App\Http\Resources\CourtCaseResource;
 use App\Models\CourtCase;
 use App\Models\Prisoner;
-use App\Services\AuditService;
 use App\Services\CourtService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -15,7 +14,6 @@ class CourtCaseController extends Controller
 {
     public function __construct(
         protected CourtService $court,
-        protected AuditService $audit,
     ) {}
 
     public function indexForPrisoner(Prisoner $prisoner): AnonymousResourceCollection
@@ -29,13 +27,7 @@ class CourtCaseController extends Controller
 
     public function store(StoreCourtCaseRequest $request, Prisoner $prisoner): CourtCaseResource
     {
-        $case = $this->court->createCase($prisoner, $request->validated());
-
-        $this->audit->log($request->user(), 'opened', $case, newValues: [
-            'case_number' => $case->case_number,
-            'court_name' => $case->court_name,
-            'charge' => $case->charge,
-        ]);
+        $case = $this->court->createCase($prisoner, $request->validated(), $request->user());
 
         return new CourtCaseResource($case->load('legalRepresentative', 'hearings'));
     }

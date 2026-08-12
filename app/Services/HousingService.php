@@ -12,81 +12,136 @@ use Illuminate\Validation\ValidationException;
 
 class HousingService
 {
+    public function __construct(
+        protected AuditService $audit,
+    ) {}
+
     public function assign(Prisoner $prisoner, Cell $cell, User $assignedBy): HousingAssignment
     {
         return DB::transaction(function () use ($prisoner, $cell, $assignedBy) {
+            $previousCell = $prisoner->currentHousing?->cell?->code;
+
             $prisoner->housingAssignments()->whereNull('ended_at')->update(['ended_at' => now()]);
 
-            return HousingAssignment::create([
+            $assignment = HousingAssignment::create([
                 'prisoner_id' => $prisoner->id,
                 'cell_id' => $cell->id,
                 'assigned_by' => $assignedBy->id,
                 'started_at' => now(),
             ]);
+
+            $this->audit->log(
+                $assignedBy,
+                'housing assignment changed',
+                $prisoner,
+                oldValues: ['cell' => $previousCell],
+                newValues: ['cell' => $cell->code],
+            );
+
+            return $assignment;
         });
     }
 
     /**
      * @param  array<string, mixed>  $data
      */
-    public function createBlock(array $data): Block
+    public function createBlock(array $data, User $actor): Block
     {
-        return Block::create($data);
+        return DB::transaction(function () use ($data, $actor) {
+            $block = Block::create($data);
+
+            $this->audit->log($actor, 'created', $block, newValues: ['name' => $block->name]);
+
+            return $block;
+        });
     }
 
     /**
      * @param  array<string, mixed>  $data
      */
-    public function updateBlock(Block $block, array $data): Block
+    public function updateBlock(Block $block, array $data, User $actor): Block
     {
-        $block->update($data);
+        return DB::transaction(function () use ($block, $data, $actor) {
+            $oldValues = $block->only(array_keys($data));
 
-        return $block;
+            $block->update($data);
+
+            $this->audit->log($actor, 'updated', $block, oldValues: $oldValues, newValues: $data);
+
+            return $block;
+        });
     }
 
-    public function deleteBlock(Block $block): void
+    public function deleteBlock(Block $block, User $actor): void
     {
-        if ($block->cells()->exists()) {
-            throw ValidationException::withMessages([
-                'block' => 'Delete or move all cells out of this block first.',
-            ]);
-        }
+        DB::transaction(function () use ($block, $actor) {
+            if ($block->cells()->exists()) {
+                throw ValidationException::withMessages([
+                    'block' => 'Delete or move all cells out of this block first.',
+                ]);
+            }
 
-        $block->delete();
+            $name = $block->name;
+
+            $block->delete();
+
+            $this->audit->log($actor, 'deleted', $block, oldValues: ['name' => $name]);
+        });
     }
 
     /**
      * @param  array<string, mixed>  $data
      */
-    public function createCell(array $data): Cell
+    public function createCell(array $data, User $actor): Cell
     {
-        return Cell::create($data);
+        return DB::transaction(function () use ($data, $actor) {
+            $cell = Cell::create($data);
+
+            $this->audit->log($actor, 'created', $cell, newValues: [
+                'code' => $cell->code,
+                'capacity' => $cell->capacity,
+            ]);
+
+            return $cell;
+        });
     }
 
     /**
      * @param  array<string, mixed>  $data
      */
-    public function updateCell(Cell $cell, array $data): Cell
+    public function updateCell(Cell $cell, array $data, User $actor): Cell
     {
-        if (isset($data['capacity']) && $data['capacity'] < $cell->occupancy()) {
-            throw ValidationException::withMessages([
-                'capacity' => "Capacity cannot be less than the current occupancy ({$cell->occupancy()}).",
-            ]);
-        }
+        return DB::transaction(function () use ($cell, $data, $actor) {
+            if (isset($data['capacity']) && $data['capacity'] < $cell->occupancy()) {
+                throw ValidationException::withMessages([
+                    'capacity' => "Capacity cannot be less than the current occupancy ({$cell->occupancy()}).",
+                ]);
+            }
 
-        $cell->update($data);
+            $oldValues = $cell->only(array_keys($data));
 
-        return $cell;
+            $cell->update($data);
+
+            $this->audit->log($actor, 'updated', $cell, oldValues: $oldValues, newValues: $data);
+
+            return $cell;
+        });
     }
 
-    public function deleteCell(Cell $cell): void
+    public function deleteCell(Cell $cell, User $actor): void
     {
-        if ($cell->housingAssignments()->exists()) {
-            throw ValidationException::withMessages([
-                'cell' => 'This cell has housing history and cannot be deleted.',
-            ]);
-        }
+        DB::transaction(function () use ($cell, $actor) {
+            if ($cell->housingAssignments()->exists()) {
+                throw ValidationException::withMessages([
+                    'cell' => 'This cell has housing history and cannot be deleted.',
+                ]);
+            }
 
-        $cell->delete();
+            $code = $cell->code;
+
+            $cell->delete();
+
+            $this->audit->log($actor, 'deleted', $cell, oldValues: ['code' => $code]);
+        });
     }
 }

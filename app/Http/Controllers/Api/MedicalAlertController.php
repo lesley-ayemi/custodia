@@ -8,7 +8,6 @@ use App\Http\Requests\UpdateMedicalAlertRequest;
 use App\Http\Resources\MedicalAlertResource;
 use App\Models\MedicalAlert;
 use App\Models\Prisoner;
-use App\Services\AuditService;
 use App\Services\MedicalService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -17,7 +16,6 @@ class MedicalAlertController extends Controller
 {
     public function __construct(
         protected MedicalService $medical,
-        protected AuditService $audit,
     ) {}
 
     public function indexForPrisoner(Prisoner $prisoner): AnonymousResourceCollection
@@ -33,21 +31,12 @@ class MedicalAlertController extends Controller
     {
         $alert = $this->medical->addAlert($prisoner, $request->user(), $request->validated());
 
-        $this->audit->log($request->user(), 'added medical alert', $alert, newValues: [
-            'message' => $alert->message,
-            'severity' => $alert->severity->value,
-        ]);
-
         return new MedicalAlertResource($alert->load('createdBy'));
     }
 
     public function update(UpdateMedicalAlertRequest $request, MedicalAlert $medicalAlert): MedicalAlertResource
     {
-        $oldValues = $medicalAlert->only(array_keys($request->validated()));
-
-        $this->medical->updateAlert($medicalAlert, $request->validated());
-
-        $this->audit->log($request->user(), 'updated medical alert', $medicalAlert, oldValues: $oldValues, newValues: $request->validated());
+        $this->medical->updateAlert($medicalAlert, $request->validated(), $request->user());
 
         return new MedicalAlertResource($medicalAlert->load('createdBy'));
     }
@@ -56,9 +45,7 @@ class MedicalAlertController extends Controller
     {
         $this->authorize('manage', $medicalAlert);
 
-        $this->medical->resolveAlert($medicalAlert);
-
-        $this->audit->log($request->user(), 'resolved medical alert', $medicalAlert, newValues: ['active' => false]);
+        $this->medical->resolveAlert($medicalAlert, $request->user());
 
         return new MedicalAlertResource($medicalAlert->load('createdBy'));
     }
