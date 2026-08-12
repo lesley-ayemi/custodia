@@ -33,6 +33,9 @@ async function logout(): Promise<void> {
                         <router-link :to="{ name: 'court.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
                             Court
                         </router-link>
+                        <router-link :to="{ name: 'programmes.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
+                            Programmes
+                        </router-link>
                         <router-link
                             v-if="auth.hasRole('admin', 'supervisor')"
                             :to="{ name: 'audit.index' }"

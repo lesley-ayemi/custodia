@@ -6,6 +6,7 @@ import StatusBadge from '../../components/StatusBadge.vue';
 import HousingHistoryTimeline from '../../components/HousingHistoryTimeline.vue';
 import CourtCasesPanel from '../../components/CourtCasesPanel.vue';
 import PropertyPanel from '../../components/PropertyPanel.vue';
+import ProgrammesPanel from '../../components/ProgrammesPanel.vue';
 import { usePrisonerStore } from '../../stores/prisoner';
 import { useHousingStore } from '../../stores/housing';
 import { useAuthStore } from '../../stores/auth';
@@ -138,6 +139,10 @@ onMounted(load);
 
             <div class="mt-6 max-w-4xl">
                 <PropertyPanel :prisoner-id="prisoner.id" />
+            </div>
+
+            <div class="mt-6 max-w-4xl">
+                <ProgrammesPanel :prisoner-id="prisoner.id" />
             </div>
 
             <div v-if="auth.hasRole('officer', 'admin')" class="mt-6">

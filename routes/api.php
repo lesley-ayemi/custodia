@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\HousingAssignmentController;
 use App\Http\Controllers\Api\IncidentController;
 use App\Http\Controllers\Api\LegalRepresentativeController;
 use App\Http\Controllers\Api\PrisonerController;
+use App\Http\Controllers\Api\ProgrammeAttendanceController;
+use App\Http\Controllers\Api\ProgrammeController;
+use App\Http\Controllers\Api\ProgrammeEnrolmentController;
 use App\Http\Controllers\Api\PropertyItemController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -51,4 +54,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/prisoners/{prisoner}/property', [PropertyItemController::class, 'indexForPrisoner']);
     Route::post('/prisoners/{prisoner}/property', [PropertyItemController::class, 'store']);
     Route::post('/property-items/{propertyItem}/release', [PropertyItemController::class, 'release']);
+
+    Route::apiResource('programmes', ProgrammeController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::get('/prisoners/{prisoner}/programme-enrolments', [ProgrammeEnrolmentController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/programme-enrolments', [ProgrammeEnrolmentController::class, 'store']);
+    Route::post('/programme-enrolments/{programmeEnrolment}/complete', [ProgrammeEnrolmentController::class, 'complete']);
+    Route::post('/programme-enrolments/{programmeEnrolment}/withdraw', [ProgrammeEnrolmentController::class, 'withdraw']);
+    Route::post('/programme-enrolments/{programmeEnrolment}/attendance', [ProgrammeAttendanceController::class, 'store']);
 });
