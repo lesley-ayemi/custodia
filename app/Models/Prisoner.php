@@ -62,6 +62,11 @@ class Prisoner extends Model
         return $this->hasMany(CourtCase::class)->orderByDesc('opened_at');
     }
 
+    public function sentences(): HasMany
+    {
+        return $this->hasMany(Sentence::class)->orderByDesc('sentence_start');
+    }
+
     public function propertyItems(): HasMany
     {
         return $this->hasMany(PropertyItem::class)->orderByDesc('received_at');

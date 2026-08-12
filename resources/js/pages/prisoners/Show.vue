@@ -5,6 +5,7 @@ import DashboardLayout from '../../layouts/DashboardLayout.vue';
 import StatusBadge from '../../components/StatusBadge.vue';
 import HousingHistoryTimeline from '../../components/HousingHistoryTimeline.vue';
 import CourtCasesPanel from '../../components/CourtCasesPanel.vue';
+import SentencesPanel from '../../components/SentencesPanel.vue';
 import PropertyPanel from '../../components/PropertyPanel.vue';
 import ProgrammesPanel from '../../components/ProgrammesPanel.vue';
 import ReleaseReviewPanel from '../../components/ReleaseReviewPanel.vue';
@@ -151,6 +152,10 @@ onMounted(load);
 
             <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">
                 <CourtCasesPanel :prisoner-id="prisoner.id" />
+            </div>
+
+            <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">
+                <SentencesPanel :prisoner-id="prisoner.id" />
             </div>
 
             <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">

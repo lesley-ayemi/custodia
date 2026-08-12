@@ -38,6 +38,12 @@ const colorClasses: Record<string, string> = {
     awaiting_medical: 'bg-amber-100 text-amber-800',
     awaiting_housing: 'bg-amber-100 text-amber-800',
     maximum: 'bg-red-100 text-red-800',
+    custodial: 'bg-red-100 text-red-800',
+    suspended: 'bg-amber-100 text-amber-800',
+    life: 'bg-slate-800 text-white',
+    convicted: 'bg-slate-100 text-slate-600',
+    on_appeal: 'bg-blue-100 text-blue-800',
+    discharged: 'bg-emerald-100 text-emerald-800',
 };
 
 const label = computed(() =>

@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\ProgrammeController;
 use App\Http\Controllers\Api\ProgrammeEnrolmentController;
 use App\Http\Controllers\Api\PropertyItemController;
 use App\Http\Controllers\Api\ReleaseReviewController;
+use App\Http\Controllers\Api\SentenceController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VisitController;
 use App\Http\Controllers\Api\VisitorController;
@@ -62,6 +63,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/legal-representatives', [LegalRepresentativeController::class, 'index']);
     Route::post('/legal-representatives', [LegalRepresentativeController::class, 'store']);
+
+    Route::get('/prisoners/{prisoner}/sentences', [SentenceController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/sentences', [SentenceController::class, 'store']);
+    Route::get('/sentences/{sentence}', [SentenceController::class, 'show']);
 
     Route::get('/prisoners/{prisoner}/property', [PropertyItemController::class, 'indexForPrisoner']);
     Route::post('/prisoners/{prisoner}/property', [PropertyItemController::class, 'store']);
