@@ -10,12 +10,12 @@ class PrisonerPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(Role::Admin, Role::Officer, Role::Supervisor);
+        return $user->hasRole(Role::Admin, Role::Officer, Role::Supervisor, Role::Medical);
     }
 
     public function view(User $user, Prisoner $prisoner): bool
     {
-        return $user->hasRole(Role::Admin, Role::Officer, Role::Supervisor);
+        return $user->hasRole(Role::Admin, Role::Officer, Role::Supervisor, Role::Medical);
     }
 
     public function create(User $user): bool

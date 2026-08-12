@@ -10,6 +10,10 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\HousingAssignmentController;
 use App\Http\Controllers\Api\IncidentController;
 use App\Http\Controllers\Api\LegalRepresentativeController;
+use App\Http\Controllers\Api\MedicalAlertController;
+use App\Http\Controllers\Api\MedicalAppointmentController;
+use App\Http\Controllers\Api\MedicalRecordController;
+use App\Http\Controllers\Api\PrescriptionController;
 use App\Http\Controllers\Api\PrisonerController;
 use App\Http\Controllers\Api\ProgrammeAttendanceController;
 use App\Http\Controllers\Api\ProgrammeController;
@@ -72,4 +76,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/release-reviews/{releaseReview}/documentation', [ReleaseReviewController::class, 'recordDocumentation']);
     Route::post('/release-reviews/{releaseReview}/supervisor-approval', [ReleaseReviewController::class, 'approveBySupervisor']);
     Route::post('/release-reviews/{releaseReview}/cancel', [ReleaseReviewController::class, 'cancel']);
+
+    Route::get('/prisoners/{prisoner}/medical-records', [MedicalRecordController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/medical-records', [MedicalRecordController::class, 'store']);
+
+    Route::get('/medical-appointments/upcoming', [MedicalAppointmentController::class, 'upcoming']);
+    Route::get('/prisoners/{prisoner}/medical-appointments', [MedicalAppointmentController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/medical-appointments', [MedicalAppointmentController::class, 'store']);
+    Route::post('/medical-appointments/{medicalAppointment}/complete', [MedicalAppointmentController::class, 'complete']);
+    Route::post('/medical-appointments/{medicalAppointment}/cancel', [MedicalAppointmentController::class, 'cancel']);
+
+    Route::get('/prisoners/{prisoner}/prescriptions', [PrescriptionController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/prescriptions', [PrescriptionController::class, 'store']);
+    Route::post('/prescriptions/{prescription}/discontinue', [PrescriptionController::class, 'discontinue']);
+
+    Route::get('/prisoners/{prisoner}/medical-alerts', [MedicalAlertController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/medical-alerts', [MedicalAlertController::class, 'store']);
+    Route::put('/medical-alerts/{medicalAlert}', [MedicalAlertController::class, 'update']);
+    Route::post('/medical-alerts/{medicalAlert}/resolve', [MedicalAlertController::class, 'resolve']);
 });

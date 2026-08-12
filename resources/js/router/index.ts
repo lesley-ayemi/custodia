@@ -78,6 +78,12 @@ const router = createRouter({
             meta: { requiresAuth: true },
         },
         {
+            path: '/medical',
+            name: 'medical.index',
+            component: () => import('../pages/medical/Index.vue'),
+            meta: { requiresAuth: true, roles: ['medical', 'admin'] },
+        },
+        {
             path: '/incidents/create',
             name: 'incidents.create',
             component: () => import('../pages/incidents/Create.vue'),

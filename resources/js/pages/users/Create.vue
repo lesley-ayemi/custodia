@@ -75,6 +75,7 @@ async function submit(): Promise<void> {
                     <option value="admin">Admin</option>
                     <option value="officer">Officer</option>
                     <option value="supervisor">Supervisor</option>
+                    <option value="medical">Medical</option>
                 </select>
             </div>
 

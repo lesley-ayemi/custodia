@@ -76,4 +76,24 @@ class Prisoner extends Model
     {
         return $this->hasMany(ReleaseReview::class)->orderByDesc('initiated_at');
     }
+
+    public function medicalRecords(): HasMany
+    {
+        return $this->hasMany(MedicalRecord::class)->orderByDesc('recorded_at');
+    }
+
+    public function medicalAppointments(): HasMany
+    {
+        return $this->hasMany(MedicalAppointment::class)->orderByDesc('scheduled_at');
+    }
+
+    public function prescriptions(): HasMany
+    {
+        return $this->hasMany(Prescription::class)->orderByDesc('start_date');
+    }
+
+    public function medicalAlerts(): HasMany
+    {
+        return $this->hasMany(MedicalAlert::class)->orderByDesc('created_at');
+    }
 }

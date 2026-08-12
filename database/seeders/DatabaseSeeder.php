@@ -35,6 +35,11 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Sara Supervisor', 'password' => Hash::make('password'), 'role' => Role::Supervisor],
         );
 
+        User::query()->updateOrCreate(
+            ['email' => 'medical@demo.com'],
+            ['name' => 'Mira Medical', 'password' => Hash::make('password'), 'role' => Role::Medical],
+        );
+
         if (Prisoner::query()->count() === 0) {
             Prisoner::factory(40)->create();
 

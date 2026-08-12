@@ -8,6 +8,8 @@ import CourtCasesPanel from '../../components/CourtCasesPanel.vue';
 import PropertyPanel from '../../components/PropertyPanel.vue';
 import ProgrammesPanel from '../../components/ProgrammesPanel.vue';
 import ReleaseReviewPanel from '../../components/ReleaseReviewPanel.vue';
+import MedicalAlertsPanel from '../../components/MedicalAlertsPanel.vue';
+import MedicalPanel from '../../components/MedicalPanel.vue';
 import { usePrisonerStore } from '../../stores/prisoner';
 import { useHousingStore } from '../../stores/housing';
 import { useAuthStore } from '../../stores/auth';
@@ -30,6 +32,8 @@ const availableCells = computed(() =>
     housingStore.blocks.flatMap((block) => block.cells.map((cell) => ({ ...cell, blockName: block.name }))).filter((cell) => cell.available > 0),
 );
 
+const canSeeCustodyOperations = computed(() => auth.hasRole('admin', 'officer', 'supervisor'));
+
 function formatDate(value: string | null): string {
     if (!value) return '—';
     return new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -38,8 +42,11 @@ function formatDate(value: string | null): string {
 async function load(): Promise<void> {
     const id = Number(route.params.id);
     prisoner.value = await prisonerStore.fetchOne(id);
-    history.value = await housingStore.fetchHistory(id);
-    await housingStore.fetchBlocks();
+
+    if (canSeeCustodyOperations.value) {
+        history.value = await housingStore.fetchHistory(id);
+        await housingStore.fetchBlocks();
+    }
 }
 
 async function archive(): Promise<void> {
@@ -100,7 +107,11 @@ onMounted(load);
                 </div>
             </div>
 
-            <div class="mt-6 grid max-w-4xl grid-cols-2 gap-6">
+            <div class="mt-6 max-w-4xl">
+                <MedicalAlertsPanel :prisoner-id="prisoner.id" />
+            </div>
+
+            <div v-if="canSeeCustodyOperations" class="mt-6 grid max-w-4xl grid-cols-2 gap-6">
                 <div class="rounded-lg border border-slate-200 bg-white p-6">
                     <h2 class="text-sm font-semibold text-slate-700">Current cell</h2>
                     <p v-if="prisoner.current_cell" class="mt-2 text-lg font-medium text-slate-900">
@@ -134,20 +145,24 @@ onMounted(load);
                 </div>
             </div>
 
-            <div class="mt-6 max-w-4xl">
+            <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">
                 <CourtCasesPanel :prisoner-id="prisoner.id" />
             </div>
 
-            <div class="mt-6 max-w-4xl">
+            <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">
                 <PropertyPanel :prisoner-id="prisoner.id" />
             </div>
 
-            <div class="mt-6 max-w-4xl">
+            <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">
                 <ProgrammesPanel :prisoner-id="prisoner.id" />
             </div>
 
-            <div class="mt-6 max-w-4xl">
+            <div v-if="canSeeCustodyOperations" class="mt-6 max-w-4xl">
                 <ReleaseReviewPanel :prisoner-id="prisoner.id" :prisoner-status="prisoner.status" @released="load" />
+            </div>
+
+            <div v-if="auth.hasRole('medical', 'admin')" class="mt-6 max-w-4xl">
+                <MedicalPanel :prisoner-id="prisoner.id" />
             </div>
 
             <div v-if="auth.hasRole('officer', 'admin')" class="mt-6">

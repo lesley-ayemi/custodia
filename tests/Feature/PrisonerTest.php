@@ -51,8 +51,8 @@ test('a supervisor cannot register a prisoner', function () {
     $response->assertForbidden();
 });
 
-test('all three roles can view the prisoner list', function () {
-    foreach ([Role::Admin, Role::Officer, Role::Supervisor] as $role) {
+test('all four roles can view the prisoner list', function () {
+    foreach ([Role::Admin, Role::Officer, Role::Supervisor, Role::Medical] as $role) {
         $user = User::factory()->create(['role' => $role]);
 
         $this->actingAs($user)->getJson('/api/prisoners')->assertOk();
