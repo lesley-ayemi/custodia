@@ -59,15 +59,14 @@ onMounted(load);
 
 <template>
     <DashboardLayout>
-        <h1 class="text-xl font-semibold text-slate-900">Releases</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Releases</h1>
 
         <div class="mt-4 flex gap-2">
             <button
                 v-for="tab in tabs"
                 :key="tab.label"
                 type="button"
-                class="rounded-full px-3 py-1 text-sm"
-                :class="statusFilter === tab.value ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                :class="statusFilter === tab.value ? 'tab-pill-active' : 'tab-pill-inactive'"
                 @click="setFilter(tab.value)"
             >
                 {{ tab.label }}
@@ -75,7 +74,7 @@ onMounted(load);
         </div>
 
         <div class="mt-6 space-y-4">
-            <div v-for="review in store.reviews" :key="review.id" class="rounded-lg border border-slate-200 bg-white p-4">
+            <div v-for="review in store.reviews" :key="review.id" class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                 <div class="flex items-center justify-between">
                     <p class="text-sm font-medium text-slate-900">{{ review.prisoner_name }}</p>
                     <StatusBadge :status="review.status" />
@@ -83,10 +82,10 @@ onMounted(load);
                 <p class="mt-1 text-xs text-slate-400">Scheduled {{ formatDate(review.initiated_at) }} by {{ review.initiated_by }}</p>
 
                 <template v-if="review.status === 'in_progress'">
-                    <p v-if="review.has_open_court_cases" class="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                    <p v-if="review.has_open_court_cases" class="mt-2 rounded-xl bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800">
                         Open court case on file.
                     </p>
-                    <p v-if="review.has_unreleased_property" class="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                    <p v-if="review.has_unreleased_property" class="mt-2 rounded-xl bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800">
                         Unreleased property on file.
                     </p>
 
@@ -95,7 +94,7 @@ onMounted(load);
                             v-for="step in RELEASE_STEPS"
                             :key="step.value"
                             class="rounded-full px-2.5 py-1 text-xs"
-                            :class="stepEntry(review, step.value) ? 'bg-emerald-100 text-emerald-800' : review.next_step === step.value ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-500'"
+                            :class="stepEntry(review, step.value) ? 'bg-emerald-100 text-emerald-800' : review.next_step === step.value ? 'bg-primary-100 text-primary-700' : 'bg-slate-100 text-slate-500'"
                         >
                             {{ stepEntry(review, step.value) ? '✓ ' : '' }}{{ step.label }}
                         </span>
@@ -111,12 +110,12 @@ onMounted(load);
                                 v-model="notesDraft"
                                 type="text"
                                 placeholder="Notes (optional)"
-                                class="block flex-1 rounded-md border border-slate-300 px-2 py-1 text-xs"
+                                class="field-input-sm flex-1 text-xs"
                             />
                             <button
                                 type="button"
                                 :disabled="actingKey === `${review.id}:${step.value}`"
-                                class="shrink-0 rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
+                                class="btn-primary-sm"
                                 @click="submitStep(review, step.value, step.endpoint)"
                             >
                                 {{ actingKey === `${review.id}:${step.value}` ? 'Saving…' : step.gate === 'supervisor' ? 'Approve' : 'Complete' }}

@@ -57,11 +57,11 @@ onMounted(load);
 <template>
     <DashboardLayout>
         <div class="flex items-center justify-between">
-            <h1 class="text-xl font-semibold text-slate-900">Incidents</h1>
+            <h1 class="text-2xl font-bold text-slate-900">Incidents</h1>
             <router-link
                 v-if="auth.hasRole('officer', 'admin')"
                 :to="{ name: 'incidents.create' }"
-                class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                class="btn-primary"
             >
                 Report incident
             </router-link>
@@ -72,30 +72,29 @@ onMounted(load);
                 v-for="tab in tabs"
                 :key="tab.label"
                 type="button"
-                class="rounded-full px-3 py-1 text-sm"
-                :class="statusFilter === tab.value ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                :class="statusFilter === tab.value ? 'tab-pill-active' : 'tab-pill-inactive'"
                 @click="setFilter(tab.value)"
             >
                 {{ tab.label }}
             </button>
         </div>
 
-        <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <table class="min-w-full divide-y divide-slate-200 text-sm">
-                <thead class="bg-slate-50 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
+        <div class="mt-4 surface-shell">
+            <table class="w-full text-sm">
+                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
                     <tr>
-                        <th class="px-4 py-3">Incident #</th>
-                        <th class="px-4 py-3">Prisoner</th>
-                        <th class="px-4 py-3">Type</th>
-                        <th class="px-4 py-3">Severity</th>
-                        <th class="px-4 py-3">Occurred</th>
-                        <th class="px-4 py-3">Status</th>
-                        <th v-if="auth.hasRole('supervisor', 'admin')" class="px-4 py-3">Actions</th>
-                        <th v-if="auth.hasRole('admin')" class="px-4 py-3"></th>
+                        <th class="table-header-cell">Incident #</th>
+                        <th class="table-header-cell">Prisoner</th>
+                        <th class="table-header-cell">Type</th>
+                        <th class="table-header-cell">Severity</th>
+                        <th class="table-header-cell">Occurred</th>
+                        <th class="table-header-cell">Status</th>
+                        <th v-if="auth.hasRole('supervisor', 'admin')" class="table-header-cell">Actions</th>
+                        <th v-if="auth.hasRole('admin')" class="table-header-cell"></th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
-                    <tr v-for="incident in store.incidents" :key="incident.id">
+                <tbody>
+                    <tr v-for="incident in store.incidents" :key="incident.id" class="table-row">
                         <td class="px-4 py-3 font-medium text-slate-900">{{ incident.incident_number }}</td>
                         <td class="px-4 py-3 text-slate-700">{{ incident.prisoner_name }}</td>
                         <td class="px-4 py-3 text-slate-500 capitalize">{{ incident.type.replaceAll('_', ' ') }}</td>
@@ -107,7 +106,7 @@ onMounted(load);
                                 v-if="incident.status === 'reported'"
                                 type="button"
                                 :disabled="actingId === incident.id"
-                                class="text-blue-700 hover:underline disabled:opacity-50"
+                                class="text-primary-600 hover:underline disabled:opacity-50"
                                 @click="review(incident.id)"
                             >
                                 Review

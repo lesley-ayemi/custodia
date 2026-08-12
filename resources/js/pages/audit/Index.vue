@@ -47,10 +47,10 @@ onMounted(() => store.fetchList());
 
 <template>
     <DashboardLayout>
-        <h1 class="text-xl font-semibold text-slate-900">Audit Log</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Audit Log</h1>
 
         <div class="mt-6 space-y-4">
-            <div v-for="log in store.logs" :key="log.id" class="rounded-lg border border-slate-200 bg-white p-4">
+            <div v-for="log in store.logs" :key="log.id" class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                 <div class="flex items-baseline justify-between text-sm">
                     <span class="font-medium text-slate-900">{{ formatDateTime(log.created_at) }}</span>
                     <span class="text-slate-500">{{ log.user_name }}</span>
@@ -74,7 +74,7 @@ onMounted(() => store.fetchList());
                 <button
                     type="button"
                     :disabled="store.currentPage <= 1"
-                    class="rounded-md border border-slate-300 px-3 py-1 disabled:opacity-40"
+                    class="btn-secondary-sm"
                     @click="goToPage(store.currentPage - 1)"
                 >
                     Previous
@@ -82,7 +82,7 @@ onMounted(() => store.fetchList());
                 <button
                     type="button"
                     :disabled="store.currentPage >= store.lastPage"
-                    class="rounded-md border border-slate-300 px-3 py-1 disabled:opacity-40"
+                    class="btn-secondary-sm"
                     @click="goToPage(store.currentPage + 1)"
                 >
                     Next

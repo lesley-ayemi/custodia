@@ -80,41 +80,41 @@ onMounted(load);
 </script>
 
 <template>
-    <div class="rounded-lg border border-slate-200 bg-white p-6">
+    <div class="surface-card">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-700">Court cases</h2>
             <button
                 v-if="auth.hasRole('officer', 'admin')"
                 type="button"
-                class="text-sm font-medium text-slate-900 hover:underline"
+                class="text-sm font-medium text-primary-600 hover:underline"
                 @click="showCaseForm = !showCaseForm"
             >
                 {{ showCaseForm ? 'Cancel' : '+ Open case' }}
             </button>
         </div>
 
-        <form v-if="showCaseForm" class="mt-4 space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submitCase">
+        <form v-if="showCaseForm" class="mt-4 space-y-3 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submitCase">
             <div>
-                <label class="block text-xs font-medium text-slate-600">Court name</label>
+                <label class="field-label">Court name</label>
                 <input
                     v-model="caseForm.court_name"
                     type="text"
                     required
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                    class="mt-1 field-input-sm"
                 />
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-600">Charge</label>
+                <label class="field-label">Charge</label>
                 <input
                     v-model="caseForm.charge"
                     type="text"
                     required
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                    class="mt-1 field-input-sm"
                 />
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-600">Legal representative</label>
-                <select v-model="caseForm.legal_representative_id" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm">
+                <label class="field-label">Legal representative</label>
+                <select v-model="caseForm.legal_representative_id" class="mt-1 field-input-sm">
                     <option :value="null">None assigned</option>
                     <option v-for="rep in court.legalRepresentatives" :key="rep.id" :value="rep.id">
                         {{ rep.name }}<span v-if="rep.firm_name"> — {{ rep.firm_name }}</span>
@@ -122,25 +122,25 @@ onMounted(load);
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-600">Opened</label>
+                <label class="field-label">Opened</label>
                 <input
                     v-model="caseForm.opened_at"
                     type="date"
                     required
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                    class="mt-1 field-input-sm"
                 />
             </div>
             <button
                 type="submit"
                 :disabled="openingCase"
-                class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                class="btn-primary-sm"
             >
                 {{ openingCase ? 'Opening…' : 'Open case' }}
             </button>
         </form>
 
         <div class="mt-4 space-y-4">
-            <div v-for="courtCase in court.cases" :key="courtCase.id" class="rounded-md border border-slate-200 p-4">
+            <div v-for="courtCase in court.cases" :key="courtCase.id" class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-sm font-medium text-slate-900">{{ courtCase.case_number }}</p>
@@ -169,11 +169,11 @@ onMounted(load);
 
                     <form
                         v-if="hearingFormOpenFor === courtCase.id"
-                        class="mt-2 space-y-2 rounded-md bg-slate-50 p-3"
+                        class="mt-2 space-y-2 rounded-xl border border-slate-100 bg-slate-50/60 p-3"
                         @submit.prevent="submitHearing(courtCase.id)"
                     >
                         <div class="grid grid-cols-2 gap-2">
-                            <select v-model="hearingForm.type" class="rounded-md border border-slate-300 px-2 py-1 text-xs">
+                            <select v-model="hearingForm.type" class="field-input-sm text-xs">
                                 <option value="arraignment">Arraignment</option>
                                 <option value="bail">Bail</option>
                                 <option value="trial">Trial</option>
@@ -185,19 +185,19 @@ onMounted(load);
                                 type="text"
                                 required
                                 placeholder="Location"
-                                class="rounded-md border border-slate-300 px-2 py-1 text-xs"
+                                class="field-input-sm text-xs"
                             />
                         </div>
                         <input
                             v-model="hearingForm.scheduled_at"
                             type="datetime-local"
                             required
-                            class="block w-full rounded-md border border-slate-300 px-2 py-1 text-xs"
+                            class="field-input-sm text-xs"
                         />
                         <button
                             type="submit"
                             :disabled="schedulingHearing"
-                            class="rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                            class="btn-primary-sm"
                         >
                             {{ schedulingHearing ? 'Scheduling…' : 'Schedule' }}
                         </button>

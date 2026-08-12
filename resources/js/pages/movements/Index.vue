@@ -33,22 +33,22 @@ onMounted(load);
 
 <template>
     <DashboardLayout>
-        <h1 class="text-xl font-semibold text-slate-900">Movements</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Movements</h1>
 
-        <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <table class="min-w-full divide-y divide-slate-200 text-sm">
-                <thead class="bg-slate-50 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
+        <div class="mt-4 surface-shell">
+            <table class="w-full text-sm">
+                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
                     <tr>
-                        <th class="px-4 py-3">Prisoner</th>
-                        <th class="px-4 py-3">Route</th>
-                        <th class="px-4 py-3">Reason</th>
-                        <th class="px-4 py-3">Scheduled</th>
-                        <th class="px-4 py-3">Status</th>
-                        <th class="px-4 py-3">Actions</th>
+                        <th class="table-header-cell">Prisoner</th>
+                        <th class="table-header-cell">Route</th>
+                        <th class="table-header-cell">Reason</th>
+                        <th class="table-header-cell">Scheduled</th>
+                        <th class="table-header-cell">Status</th>
+                        <th class="table-header-cell">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
-                    <tr v-for="movement in store.upcoming" :key="movement.id">
+                <tbody>
+                    <tr v-for="movement in store.upcoming" :key="movement.id" class="table-row">
                         <td class="px-4 py-3 font-medium text-slate-900">
                             <router-link :to="{ name: 'prisoners.show', params: { id: movement.prisoner_id } }" class="hover:underline">
                                 {{ movement.prisoner_name }}

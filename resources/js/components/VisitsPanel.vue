@@ -124,22 +124,22 @@ onMounted(load);
 </script>
 
 <template>
-    <div class="rounded-lg border border-slate-200 bg-white p-6">
+    <div class="surface-card">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-700">Visits</h2>
             <button
                 v-if="auth.hasRole('officer', 'admin')"
                 type="button"
-                class="text-sm font-medium text-slate-900 hover:underline"
+                class="text-sm font-medium text-primary-600 hover:underline"
                 @click="showForm = !showForm"
             >
                 {{ showForm ? 'Cancel' : '+ Request visit' }}
             </button>
         </div>
 
-        <form v-if="showForm" class="mt-4 space-y-2 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submitRequest">
+        <form v-if="showForm" class="mt-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submitRequest">
             <div class="grid grid-cols-2 gap-2">
-                <select v-model="form.visitor_id" required class="rounded-md border border-slate-300 px-2 py-1.5 text-sm">
+                <select v-model="form.visitor_id" required class="field-input-sm">
                     <option :value="null" disabled>Select a visitor…</option>
                     <option v-for="visitor in store.visitors" :key="visitor.id" :value="visitor.id">
                         {{ visitor.name }}<span v-if="visitor.banned_at"> (banned)</span>
@@ -150,26 +150,26 @@ onMounted(load);
                     type="text"
                     required
                     placeholder="Relationship (e.g. Spouse)"
-                    class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                    class="field-input-sm"
                 />
             </div>
             <input
                 v-model="form.requested_visit_date"
                 type="date"
                 required
-                class="block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                class="field-input-sm"
             />
             <button
                 type="submit"
                 :disabled="submitting"
-                class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                class="btn-primary-sm"
             >
                 {{ submitting ? 'Requesting…' : 'Request visit' }}
             </button>
         </form>
 
         <ul class="mt-4 space-y-3">
-            <li v-for="request in store.requests" :key="request.id" class="rounded-md border border-slate-200 p-3 text-sm">
+            <li v-for="request in store.requests" :key="request.id" class="rounded-xl border border-slate-100 bg-white p-3 text-sm shadow-sm">
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="font-medium text-slate-900">{{ request.visitor_name }}</p>
@@ -192,22 +192,22 @@ onMounted(load);
 
                 <form
                     v-if="approveFormOpenFor === request.id"
-                    class="mt-2 flex items-end gap-2 rounded-md bg-slate-50 p-2"
+                    class="mt-2 flex items-end gap-2 rounded-xl border border-slate-100 bg-slate-50/60 p-2"
                     @submit.prevent="submitApprove(request.id)"
                 >
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-slate-600">Scheduled date/time</label>
+                        <label class="field-label">Scheduled date/time</label>
                         <input
                             v-model="scheduledAtDraft"
                             type="datetime-local"
                             required
-                            class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1 text-xs"
+                            class="mt-1 field-input-sm text-xs"
                         />
                     </div>
                     <button
                         type="submit"
                         :disabled="busyKey === `approve-${request.id}`"
-                        class="rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
+                        class="btn-primary-sm"
                     >
                         {{ busyKey === `approve-${request.id}` ? 'Saving…' : 'Confirm' }}
                     </button>
@@ -215,17 +215,17 @@ onMounted(load);
 
                 <form
                     v-if="rejectFormOpenFor === request.id"
-                    class="mt-2 flex items-end gap-2 rounded-md bg-slate-50 p-2"
+                    class="mt-2 flex items-end gap-2 rounded-xl border border-slate-100 bg-slate-50/60 p-2"
                     @submit.prevent="submitReject(request.id)"
                 >
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-slate-600">Reason (optional)</label>
-                        <input v-model="rejectReasonDraft" type="text" class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1 text-xs" />
+                        <label class="field-label">Reason (optional)</label>
+                        <input v-model="rejectReasonDraft" type="text" class="mt-1 field-input-sm text-xs" />
                     </div>
                     <button
                         type="submit"
                         :disabled="busyKey === `reject-${request.id}`"
-                        class="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                        class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
                     >
                         {{ busyKey === `reject-${request.id}` ? 'Saving…' : 'Confirm reject' }}
                     </button>

@@ -81,7 +81,7 @@ onMounted(load);
 </script>
 
 <template>
-    <div class="rounded-lg border border-slate-200 bg-white p-6">
+    <div class="surface-card">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-700">Release</h2>
             <button
@@ -96,19 +96,19 @@ onMounted(load);
         </div>
 
         <div v-if="activeReview" class="mt-4 space-y-4">
-            <p v-if="activeReview.has_open_court_cases" class="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <p v-if="activeReview.has_open_court_cases" class="rounded-xl bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800">
                 This prisoner has an open court case on file.
             </p>
-            <p v-if="activeReview.has_unreleased_property" class="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <p v-if="activeReview.has_unreleased_property" class="rounded-xl bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800">
                 This prisoner still has unreleased property on file.
             </p>
 
             <ol class="space-y-3">
-                <li v-for="step in RELEASE_STEPS" :key="step.value" class="rounded-md border border-slate-200 p-3">
+                <li v-for="step in RELEASE_STEPS" :key="step.value" class="rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-slate-900">{{ step.label }}</span>
                         <span v-if="stepEntry(step.value)" class="text-xs font-medium text-emerald-700">✓ Complete</span>
-                        <span v-else-if="activeReview.next_step === step.value" class="text-xs font-medium text-blue-700">Next</span>
+                        <span v-else-if="activeReview.next_step === step.value" class="text-xs font-medium text-primary-600">Next</span>
                         <span v-else class="text-xs text-slate-400">Pending</span>
                     </div>
 
@@ -123,12 +123,12 @@ onMounted(load);
                                 v-model="notesDraft"
                                 type="text"
                                 placeholder="Notes (optional)"
-                                class="block flex-1 rounded-md border border-slate-300 px-2 py-1 text-xs"
+                                class="field-input-sm flex-1 text-xs"
                             />
                             <button
                                 type="button"
                                 :disabled="actingStep === step.value"
-                                class="shrink-0 rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
+                                class="btn-primary-sm"
                                 @click="submitStep(step.value, step.endpoint)"
                             >
                                 {{ actingStep === step.value ? 'Saving…' : step.gate === 'supervisor' ? 'Approve' : 'Complete' }}
@@ -145,15 +145,15 @@ onMounted(load);
                 <button type="button" class="text-xs font-medium text-red-600 hover:underline" @click="showCancelForm = !showCancelForm">
                     {{ showCancelForm ? 'Cancel' : 'Cancel release review' }}
                 </button>
-                <form v-if="showCancelForm" class="mt-2 flex items-end gap-2 rounded-md bg-slate-50 p-3" @submit.prevent="submitCancel">
+                <form v-if="showCancelForm" class="mt-2 flex items-end gap-2 rounded-xl border border-slate-100 bg-slate-50/60 p-3" @submit.prevent="submitCancel">
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-slate-600">Reason (optional)</label>
-                        <input v-model="cancelReason" type="text" class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1 text-xs" />
+                        <label class="field-label">Reason (optional)</label>
+                        <input v-model="cancelReason" type="text" class="mt-1 field-input-sm text-xs" />
                     </div>
                     <button
                         type="submit"
                         :disabled="cancelling"
-                        class="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                        class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
                     >
                         {{ cancelling ? 'Cancelling…' : 'Confirm cancel' }}
                     </button>
@@ -161,7 +161,7 @@ onMounted(load);
             </div>
         </div>
 
-        <div v-else-if="latestReview" class="mt-4 rounded-md border border-slate-200 p-4">
+        <div v-else-if="latestReview" class="mt-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm text-slate-700">
                     {{ latestReview.status === 'released' ? `Released ${formatDate(latestReview.released_at!)}` : 'Release review cancelled' }}

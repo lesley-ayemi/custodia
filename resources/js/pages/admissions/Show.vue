@@ -75,7 +75,7 @@ onMounted(load);
                     >
                         {{ store.current.prisoner_name }}
                     </router-link>
-                    <h1 class="text-xl font-semibold text-slate-900">Admission</h1>
+                    <h1 class="text-2xl font-bold text-slate-900">Admission</h1>
                     <p class="mt-1 text-sm text-slate-500">
                         {{ store.current.admission_reason }} · Admitted {{ formatDate(store.current.admission_date) }}
                     </p>
@@ -83,10 +83,10 @@ onMounted(load);
                 <StatusBadge :status="store.current.status" />
             </div>
 
-            <p v-if="error" class="mt-3 text-sm text-red-600">{{ error }}</p>
+            <p v-if="error" class="mt-3 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{{ error }}</p>
 
             <div class="mt-6 space-y-4">
-                <div class="rounded-lg border border-slate-200 bg-white p-6">
+                <div class="surface-card">
                     <h2 class="text-sm font-semibold text-slate-700">1. Legal authority</h2>
                     <p v-if="store.current.legal_authority_reference" class="mt-2 text-sm text-slate-600">
                         ✓ {{ store.current.legal_authority_reference }}
@@ -97,12 +97,12 @@ onMounted(load);
                             type="text"
                             required
                             placeholder="Remand Order #RO-2026-0045"
-                            class="block flex-1 rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                            class="field-input-sm flex-1"
                         />
                         <button
                             type="submit"
                             :disabled="busyKey === 'legal'"
-                            class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                            class="btn-primary-sm"
                         >
                             {{ busyKey === 'legal' ? 'Saving…' : 'Record' }}
                         </button>
@@ -110,7 +110,7 @@ onMounted(load);
                 </div>
 
                 <template v-if="store.current.status !== 'draft'">
-                    <div class="rounded-lg border border-slate-200 bg-white p-6">
+                    <div class="surface-card">
                         <h2 class="text-sm font-semibold text-slate-700">2. Belongings</h2>
                         <p class="mt-2 text-sm text-slate-600">
                             {{ store.current.has_property ? '✓ Recorded' : 'Not yet recorded' }} — use the Property panel on the
@@ -121,7 +121,7 @@ onMounted(load);
                         </p>
                     </div>
 
-                    <div class="rounded-lg border border-slate-200 bg-white p-6">
+                    <div class="surface-card">
                         <h2 class="text-sm font-semibold text-slate-700">3. Initial assessment</h2>
                         <p v-if="store.current.initial_assessment_notes" class="mt-2 text-sm text-slate-600">
                             ✓ {{ store.current.initial_assessment_notes }}
@@ -136,19 +136,19 @@ onMounted(load);
                                 type="text"
                                 required
                                 placeholder="No immediate concerns noted."
-                                class="block flex-1 rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                                class="field-input-sm flex-1"
                             />
                             <button
                                 type="submit"
                                 :disabled="busyKey === 'assessment'"
-                                class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                                class="btn-primary-sm"
                             >
                                 {{ busyKey === 'assessment' ? 'Saving…' : 'Record' }}
                             </button>
                         </form>
                     </div>
 
-                    <div class="rounded-lg border border-slate-200 bg-white p-6">
+                    <div class="surface-card">
                         <h2 class="text-sm font-semibold text-slate-700">4. Security classification</h2>
                         <p v-if="store.current.security_classification" class="mt-2 text-sm text-slate-600 capitalize">
                             ✓ {{ store.current.security_classification }}
@@ -158,7 +158,7 @@ onMounted(load);
                             class="mt-3 flex items-end gap-2"
                             @submit.prevent="submitClassification"
                         >
-                            <select v-model="classification" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm">
+                            <select v-model="classification" class="field-input-sm">
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
                                 <option value="high">High</option>
@@ -167,7 +167,7 @@ onMounted(load);
                             <button
                                 type="submit"
                                 :disabled="busyKey === 'classification'"
-                                class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                                class="btn-primary-sm"
                             >
                                 {{ busyKey === 'classification' ? 'Saving…' : 'Record' }}
                             </button>
@@ -178,28 +178,28 @@ onMounted(load);
                         <button
                             type="button"
                             :disabled="!store.current.security_classification || busyKey === 'advance'"
-                            class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                            class="btn-primary"
                             @click="submitAdvance"
                         >
                             {{ busyKey === 'advance' ? 'Sending…' : 'Send for medical screening' }}
                         </button>
                     </div>
 
-                    <div v-if="store.current.status === 'awaiting_medical'" class="rounded-lg border border-slate-200 bg-white p-6">
+                    <div v-if="store.current.status === 'awaiting_medical'" class="surface-card">
                         <h2 class="text-sm font-semibold text-slate-700">5. Medical screening</h2>
                         <p class="mt-2 text-sm text-slate-500">Awaiting medical staff to complete a screening.</p>
                         <button
                             v-if="auth.hasRole('medical', 'admin')"
                             type="button"
                             :disabled="busyKey === 'medical'"
-                            class="mt-3 rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                            class="mt-3 btn-primary-sm"
                             @click="submitCompleteMedical"
                         >
                             {{ busyKey === 'medical' ? 'Saving…' : 'Complete medical screening' }}
                         </button>
                     </div>
 
-                    <div v-if="store.current.status === 'awaiting_housing'" class="rounded-lg border border-slate-200 bg-white p-6">
+                    <div v-if="store.current.status === 'awaiting_housing'" class="surface-card">
                         <h2 class="text-sm font-semibold text-slate-700">6. Housing assignment</h2>
                         <p v-if="store.current.has_housing" class="mt-2 text-sm text-slate-600">✓ Cell assigned</p>
                         <p v-else class="mt-2 text-sm text-slate-600">
@@ -213,14 +213,14 @@ onMounted(load);
                             v-if="canOperate"
                             type="button"
                             :disabled="!store.current.has_housing || busyKey === 'housing'"
-                            class="mt-3 rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                            class="mt-3 btn-primary-sm"
                             @click="submitCompleteHousing"
                         >
                             {{ busyKey === 'housing' ? 'Saving…' : 'Complete admission' }}
                         </button>
                     </div>
 
-                    <div v-if="store.current.status === 'completed'" class="rounded-lg border border-emerald-200 bg-emerald-50 p-6">
+                    <div v-if="store.current.status === 'completed'" class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
                         <p class="text-sm font-medium text-emerald-800">Admission completed {{ formatDate(store.current.completed_at!) }}.</p>
                     </div>
                 </template>

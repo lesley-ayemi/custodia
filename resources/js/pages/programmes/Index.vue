@@ -114,57 +114,57 @@ onMounted(load);
 <template>
     <DashboardLayout>
         <div class="flex items-center justify-between">
-            <h1 class="text-xl font-semibold text-slate-900">Programmes</h1>
+            <h1 class="text-2xl font-bold text-slate-900">Programmes</h1>
             <button
                 v-if="auth.hasRole('admin')"
                 type="button"
-                class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                class="btn-primary"
                 @click="showForm = !showForm"
             >
                 {{ showForm ? 'Cancel' : '+ Add programme' }}
             </button>
         </div>
 
-        <p v-if="error" class="mt-3 text-sm text-red-600">{{ error }}</p>
+        <p v-if="error" class="mt-3 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{{ error }}</p>
 
-        <form v-if="showForm" class="mt-4 space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submitNewProgramme">
+        <form v-if="showForm" class="mt-4 space-y-3 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submitNewProgramme">
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Name</label>
-                    <input v-model="newProgramme.name" type="text" required placeholder="Life Skills" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm" />
+                    <label class="field-label">Name</label>
+                    <input v-model="newProgramme.name" type="text" required placeholder="Life Skills" class="mt-1 field-input-sm" />
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Category</label>
-                    <select v-model="newProgramme.category" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm">
+                    <label class="field-label">Category</label>
+                    <select v-model="newProgramme.category" class="mt-1 field-input-sm">
                         <option v-for="c in categories" :key="c.value" :value="c.value">{{ c.label }}</option>
                     </select>
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-600">Description</label>
-                <textarea v-model="newProgramme.description" rows="2" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"></textarea>
+                <label class="field-label">Description</label>
+                <textarea v-model="newProgramme.description" rows="2" class="mt-1 field-input-sm"></textarea>
             </div>
             <div class="w-32">
-                <label class="block text-xs font-medium text-slate-600">Capacity</label>
-                <input v-model.number="newProgramme.capacity" type="number" min="1" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm" />
+                <label class="field-label">Capacity</label>
+                <input v-model.number="newProgramme.capacity" type="number" min="1" class="mt-1 field-input-sm" />
             </div>
-            <button type="submit" :disabled="busy" class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50">
+            <button type="submit" :disabled="busy" class="btn-primary-sm">
                 Create
             </button>
         </form>
 
         <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div v-for="programme in store.programmes" :key="programme.id" class="rounded-lg border border-slate-200 bg-white p-4">
+            <div v-for="programme in store.programmes" :key="programme.id" class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                 <template v-if="editingId === programme.id">
                     <div class="space-y-2">
-                        <input v-model="editProgramme.name" type="text" class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm" />
-                        <select v-model="editProgramme.category" class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm">
+                        <input v-model="editProgramme.name" type="text" class="field-input-sm w-full" />
+                        <select v-model="editProgramme.category" class="field-input-sm w-full">
                             <option v-for="c in categories" :key="c.value" :value="c.value">{{ c.label }}</option>
                         </select>
-                        <textarea v-model="editProgramme.description" rows="2" class="block w-full rounded-md border border-slate-300 px-2 py-1 text-sm"></textarea>
+                        <textarea v-model="editProgramme.description" rows="2" class="field-input-sm w-full"></textarea>
                         <div class="flex gap-2">
-                            <input v-model.number="editProgramme.capacity" type="number" min="1" class="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm" />
-                            <select v-model="editProgramme.status" class="rounded-md border border-slate-300 px-2 py-1 text-sm">
+                            <input v-model.number="editProgramme.capacity" type="number" min="1" class="w-20 rounded-lg border border-slate-200 px-2 py-1 text-sm focus:border-primary-400 focus:outline-none" />
+                            <select v-model="editProgramme.status" class="field-input-sm">
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                             </select>

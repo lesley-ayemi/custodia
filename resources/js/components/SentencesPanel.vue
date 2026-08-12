@@ -53,80 +53,80 @@ onMounted(load);
 </script>
 
 <template>
-    <div class="rounded-lg border border-slate-200 bg-white p-6">
+    <div class="surface-card">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-700">Sentences</h2>
             <button
                 v-if="auth.hasRole('officer', 'admin')"
                 type="button"
-                class="text-sm font-medium text-slate-900 hover:underline"
+                class="text-sm font-medium text-primary-600 hover:underline"
                 @click="showForm = !showForm"
             >
                 {{ showForm ? 'Cancel' : '+ Record sentence' }}
             </button>
         </div>
 
-        <form v-if="showForm" class="mt-4 space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submit">
+        <form v-if="showForm" class="mt-4 space-y-3 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submit">
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Case number</label>
+                    <label class="field-label">Case number</label>
                     <input
                         v-model="form.case_number"
                         type="text"
                         required
-                        class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                        class="mt-1 field-input-sm"
                     />
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Court</label>
+                    <label class="field-label">Court</label>
                     <input
                         v-model="form.court"
                         type="text"
                         required
-                        class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                        class="mt-1 field-input-sm"
                     />
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-600">Offence</label>
+                <label class="field-label">Offence</label>
                 <input
                     v-model="form.offence"
                     type="text"
                     required
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                    class="mt-1 field-input-sm"
                 />
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Sentence start</label>
+                    <label class="field-label">Sentence start</label>
                     <input
                         v-model="form.sentence_start"
                         type="date"
                         required
-                        class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                        class="mt-1 field-input-sm"
                     />
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Sentence end (optional)</label>
+                    <label class="field-label">Sentence end (optional)</label>
                     <input
                         v-model="form.sentence_end"
                         type="date"
-                        class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                        class="mt-1 field-input-sm"
                     />
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Sentence type</label>
-                    <select v-model="form.sentence_type" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm">
+                    <label class="field-label">Sentence type</label>
+                    <select v-model="form.sentence_type" class="mt-1 field-input-sm">
                         <option value="custodial">Custodial</option>
                         <option value="suspended">Suspended</option>
                         <option value="life">Life</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Legal status</label>
-                    <select v-model="form.legal_status" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm">
+                    <label class="field-label">Legal status</label>
+                    <select v-model="form.legal_status" class="mt-1 field-input-sm">
                         <option value="convicted">Convicted</option>
                         <option value="on_appeal">On appeal</option>
                         <option value="discharged">Discharged</option>
@@ -134,24 +134,24 @@ onMounted(load);
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-600">Parole eligibility date (optional)</label>
+                <label class="field-label">Parole eligibility date (optional)</label>
                 <input
                     v-model="form.parole_eligibility_date"
                     type="date"
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                    class="mt-1 field-input-sm"
                 />
             </div>
             <button
                 type="submit"
                 :disabled="submitting"
-                class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                class="btn-primary-sm"
             >
                 {{ submitting ? 'Recording…' : 'Record sentence' }}
             </button>
         </form>
 
         <div class="mt-4 space-y-3">
-            <div v-for="sentence in store.sentences" :key="sentence.id" class="rounded-md border border-slate-200 p-4">
+            <div v-for="sentence in store.sentences" :key="sentence.id" class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-sm font-medium text-slate-900">{{ sentence.case_number }}</p>

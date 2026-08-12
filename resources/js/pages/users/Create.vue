@@ -35,43 +35,43 @@ async function submit(): Promise<void> {
 
 <template>
     <DashboardLayout>
-        <h1 class="text-xl font-semibold text-slate-900">Add staff member</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Add staff member</h1>
 
         <form class="mt-6 max-w-lg space-y-4" @submit.prevent="submit">
             <div>
-                <label class="block text-sm font-medium text-slate-700">Name</label>
+                <label class="field-label">Name</label>
                 <input
                     v-model="form.name"
                     type="text"
                     required
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    class="mt-1 field-input"
                 />
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700">Email</label>
+                <label class="field-label">Email</label>
                 <input
                     v-model="form.email"
                     type="email"
                     required
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    class="mt-1 field-input"
                 />
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700">Password</label>
+                <label class="field-label">Password</label>
                 <input
                     v-model="form.password"
                     type="password"
                     required
                     minlength="8"
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    class="mt-1 field-input"
                 />
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700">Role</label>
-                <select v-model="form.role" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+                <label class="field-label">Role</label>
+                <select v-model="form.role" class="mt-1 field-input">
                     <option value="admin">Admin</option>
                     <option value="officer">Officer</option>
                     <option value="supervisor">Supervisor</option>
@@ -79,17 +79,17 @@ async function submit(): Promise<void> {
                 </select>
             </div>
 
-            <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+            <p v-if="error" class="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{{ error }}</p>
 
             <div class="flex gap-3">
                 <button
                     type="submit"
                     :disabled="submitting"
-                    class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                    class="btn-primary disabled:opacity-50"
                 >
                     {{ submitting ? 'Saving…' : 'Add staff member' }}
                 </button>
-                <router-link :to="{ name: 'users.index' }" class="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900">
+                <router-link :to="{ name: 'users.index' }" class="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900">
                     Cancel
                 </router-link>
             </div>

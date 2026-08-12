@@ -1,106 +1,197 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import {
+    AlertTriangle,
+    ArrowLeftRight,
+    Building2,
+    ClipboardList,
+    Gavel,
+    GraduationCap,
+    HeartPulse,
+    History,
+    LayoutDashboard,
+    LogOut,
+    Menu,
+    ShieldCheck,
+    ShieldHalf,
+    Users,
+    UserRoundCheck,
+    X,
+} from '@lucide/vue';
 
 const auth = useAuthStore();
 const router = useRouter();
+const route = useRoute();
+
+const sidebarOpen = ref(false);
+const signingOut = ref(false);
+
+interface NavItem {
+    name: string;
+    label: string;
+    icon: typeof LayoutDashboard;
+}
+
+interface NavGroup {
+    label: string;
+    items: NavItem[];
+}
+
+const navGroups = computed<NavGroup[]>(() => {
+    const groups: NavGroup[] = [
+        {
+            label: 'Overview',
+            items: [{ name: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }],
+        },
+        {
+            label: 'Custody',
+            items: [
+                { name: 'prisoners.index', label: 'Prisoners', icon: Users },
+                { name: 'housing.index', label: 'Housing', icon: Building2 },
+                { name: 'admissions.index', label: 'Admissions', icon: ClipboardList },
+                { name: 'movements.index', label: 'Movements', icon: ArrowLeftRight },
+            ],
+        },
+        {
+            label: 'Case management',
+            items: [
+                { name: 'court.index', label: 'Court', icon: Gavel },
+                { name: 'incidents.index', label: 'Incidents', icon: AlertTriangle },
+            ],
+        },
+        {
+            label: 'Welfare',
+            items: [
+                { name: 'programmes.index', label: 'Programmes', icon: GraduationCap },
+                { name: 'visitors.index', label: 'Visitors', icon: UserRoundCheck },
+                { name: 'releases.index', label: 'Releases', icon: LogOut },
+            ],
+        },
+    ];
+
+    if (auth.hasRole('medical', 'admin')) {
+        groups.push({
+            label: 'Medical',
+            items: [{ name: 'medical.index', label: 'Medical', icon: HeartPulse }],
+        });
+    }
+
+    const admin: NavItem[] = [];
+    if (auth.hasRole('admin', 'supervisor')) {
+        admin.push({ name: 'audit.index', label: 'Audit log', icon: History });
+    }
+    if (auth.hasRole('admin')) {
+        admin.push({ name: 'users.index', label: 'Staff', icon: ShieldHalf });
+    }
+    if (admin.length > 0) {
+        groups.push({ label: 'Administration', items: admin });
+    }
+
+    return groups;
+});
+
+function isActive(name: string): boolean {
+    return route.name === name || (typeof route.name === 'string' && route.name.startsWith(`${name.split('.')[0]}.`));
+}
+
+const initials = computed(() => {
+    const name = auth.user?.name ?? '';
+    return name
+        .split(' ')
+        .map((part) => part[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase();
+});
 
 async function logout(): Promise<void> {
-    await auth.logout();
-    await router.push({ name: 'login' });
+    signingOut.value = true;
+
+    try {
+        await auth.logout();
+        await router.push({ name: 'login' });
+    } finally {
+        signingOut.value = false;
+    }
 }
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50">
-        <header class="border-b border-slate-200 bg-white">
-            <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-                <div class="flex items-center gap-8">
-                    <span class="text-lg font-semibold text-slate-900">Custodia</span>
-                    <nav class="flex items-center gap-4 text-sm text-slate-600">
-                        <router-link :to="{ name: 'dashboard' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
-                            Dashboard
-                        </router-link>
-                        <router-link :to="{ name: 'prisoners.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
-                            Prisoners
-                        </router-link>
-                        <router-link :to="{ name: 'housing.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
-                            Housing
-                        </router-link>
-                        <router-link :to="{ name: 'incidents.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
-                            Incidents
-                        </router-link>
-                        <router-link :to="{ name: 'court.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
-                            Court
-                        </router-link>
-                        <router-link :to="{ name: 'programmes.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
-                            Programmes
-                        </router-link>
-                        <router-link :to="{ name: 'releases.index' }" class="hover:text-slate-900" active-class="font-semibold text-slate-900">
-                            Releases
-                        </router-link>
-                        <router-link
-                            v-if="auth.hasRole('admin', 'officer', 'supervisor')"
-                            :to="{ name: 'visitors.index' }"
-                            class="hover:text-slate-900"
-                            active-class="font-semibold text-slate-900"
-                        >
-                            Visitors
-                        </router-link>
-                        <router-link
-                            v-if="auth.hasRole('admin', 'officer', 'supervisor')"
-                            :to="{ name: 'movements.index' }"
-                            class="hover:text-slate-900"
-                            active-class="font-semibold text-slate-900"
-                        >
-                            Movements
-                        </router-link>
-                        <router-link
-                            v-if="auth.hasRole('admin', 'officer', 'supervisor')"
-                            :to="{ name: 'admissions.index' }"
-                            class="hover:text-slate-900"
-                            active-class="font-semibold text-slate-900"
-                        >
-                            Admissions
-                        </router-link>
-                        <router-link
-                            v-if="auth.hasRole('medical', 'admin')"
-                            :to="{ name: 'medical.index' }"
-                            class="hover:text-slate-900"
-                            active-class="font-semibold text-slate-900"
-                        >
-                            Medical
-                        </router-link>
-                        <router-link
-                            v-if="auth.hasRole('admin', 'supervisor')"
-                            :to="{ name: 'audit.index' }"
-                            class="hover:text-slate-900"
-                            active-class="font-semibold text-slate-900"
-                        >
-                            Audit Log
-                        </router-link>
-                        <router-link
-                            v-if="auth.hasRole('admin')"
-                            :to="{ name: 'users.index' }"
-                            class="hover:text-slate-900"
-                            active-class="font-semibold text-slate-900"
-                        >
-                            Staff
-                        </router-link>
-                    </nav>
-                </div>
-                <div class="flex items-center gap-4 text-sm">
-                    <span class="text-slate-600">
-                        {{ auth.user?.name }}
-                        <span class="text-slate-400">· {{ auth.user?.role }}</span>
+    <div class="min-h-screen bg-slate-50 lg:flex">
+        <div v-if="sidebarOpen" class="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" @click="sidebarOpen = false" />
+
+        <aside
+            class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-slate-100 bg-white transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0"
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+        >
+            <div class="flex items-center justify-between px-5 py-5">
+                <div class="flex items-center gap-2.5">
+                    <span class="icon-badge bg-primary-600">
+                        <ShieldCheck :size="20" />
                     </span>
-                    <button type="button" class="text-slate-500 hover:text-slate-900" @click="logout">Sign out</button>
+                    <span class="text-lg font-bold text-slate-900">Custodia</span>
+                </div>
+                <button type="button" class="text-slate-400 hover:text-slate-600 lg:hidden" @click="sidebarOpen = false">
+                    <X :size="20" />
+                </button>
+            </div>
+
+            <nav class="flex-1 space-y-6 overflow-y-auto px-4 pb-6">
+                <div v-for="group in navGroups" :key="group.label">
+                    <p class="px-2.5 pb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">{{ group.label }}</p>
+                    <div class="space-y-1">
+                        <router-link
+                            v-for="item in group.items"
+                            :key="item.name"
+                            :to="{ name: item.name }"
+                            class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition"
+                            :class="
+                                isActive(item.name)
+                                    ? 'bg-primary-600 text-white shadow-sm shadow-primary-600/25'
+                                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                            "
+                            @click="sidebarOpen = false"
+                        >
+                            <component :is="item.icon" :size="18" />
+                            {{ item.label }}
+                        </router-link>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="border-t border-slate-100 p-4">
+                <div class="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
+                    <span class="icon-badge bg-slate-800 text-sm font-semibold">{{ initials }}</span>
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-semibold text-slate-800">{{ auth.user?.name }}</p>
+                        <p class="text-xs text-slate-400 capitalize">{{ auth.user?.role }}</p>
+                    </div>
+                    <button
+                        type="button"
+                        title="Sign out"
+                        :disabled="signingOut"
+                        class="shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-white hover:text-red-600 disabled:opacity-50"
+                        @click="logout"
+                    >
+                        <LogOut :size="16" />
+                    </button>
                 </div>
             </div>
-        </header>
+        </aside>
 
-        <main class="mx-auto max-w-6xl px-6 py-8">
-            <slot />
-        </main>
+        <div class="min-w-0 flex-1">
+            <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-100 bg-white/80 px-6 py-3 backdrop-blur lg:hidden">
+                <button type="button" class="text-slate-500 hover:text-slate-900" @click="sidebarOpen = true">
+                    <Menu :size="22" />
+                </button>
+                <span class="text-base font-bold text-slate-900">Custodia</span>
+            </header>
+
+            <main class="mx-auto max-w-6xl px-6 py-8">
+                <slot />
+            </main>
+        </div>
     </div>
 </template>

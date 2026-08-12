@@ -79,50 +79,50 @@ onMounted(load);
 </script>
 
 <template>
-    <div class="rounded-lg border border-slate-200 bg-white p-6">
+    <div class="surface-card">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-700">Property</h2>
             <button
                 v-if="auth.hasRole('officer', 'admin')"
                 type="button"
-                class="text-sm font-medium text-slate-900 hover:underline"
+                class="text-sm font-medium text-primary-600 hover:underline"
                 @click="showForm = !showForm"
             >
                 {{ showForm ? 'Cancel' : '+ Receive property' }}
             </button>
         </div>
 
-        <form v-if="showForm" class="mt-4 space-y-4 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submit">
+        <form v-if="showForm" class="mt-4 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submit">
             <div v-for="(row, index) in draftItems" :key="index" class="space-y-2 border-b border-slate-200 pb-3 last:border-0 last:pb-0">
                 <div class="flex items-end gap-2">
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-slate-600">Description</label>
+                        <label class="field-label">Description</label>
                         <input
                             v-model="row.description"
                             type="text"
                             required
                             placeholder="Phone"
-                            class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                            class="mt-1 field-input-sm"
                         />
                     </div>
                     <div class="w-20">
-                        <label class="block text-xs font-medium text-slate-600">Qty</label>
+                        <label class="field-label">Qty</label>
                         <input
                             v-model.number="row.quantity"
                             type="number"
                             min="1"
                             required
-                            class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                            class="mt-1 field-input-sm"
                         />
                     </div>
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-slate-600">Storage location</label>
+                        <label class="field-label">Storage location</label>
                         <input
                             v-model="row.storage_location"
                             type="text"
                             required
                             placeholder="Store A"
-                            class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                            class="mt-1 field-input-sm"
                         />
                     </div>
                     <button
@@ -135,12 +135,12 @@ onMounted(load);
                     </button>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Notes <span class="text-slate-400">(optional — amount, condition, etc.)</span></label>
+                    <label class="field-label">Notes <span class="text-slate-400">(optional — amount, condition, etc.)</span></label>
                     <input
                         v-model="row.notes"
                         type="text"
                         placeholder="e.g. £120 in £20 notes"
-                        class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="mt-1 field-input-sm"
                     />
                 </div>
             </div>
@@ -150,7 +150,7 @@ onMounted(load);
                 <button
                     type="submit"
                     :disabled="submitting"
-                    class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                    class="btn-primary-sm"
                 >
                     {{ submitting ? 'Saving…' : 'Receive bag' }}
                 </button>
@@ -158,7 +158,7 @@ onMounted(load);
         </form>
 
         <div class="mt-4 space-y-4">
-            <div v-for="bag in bags" :key="bag.propertyNumber" class="rounded-md border border-slate-200 p-4">
+            <div v-for="bag in bags" :key="bag.propertyNumber" class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                 <p class="text-sm font-medium text-slate-900">Property Bag {{ bag.propertyNumber }}</p>
                 <ul class="mt-2 space-y-2">
                     <li v-for="item in bag.items" :key="item.id" class="text-sm">
@@ -184,23 +184,23 @@ onMounted(load);
 
                         <form
                             v-if="releaseFormOpenFor === item.id"
-                            class="mt-2 flex items-end gap-2 rounded-md bg-slate-50 p-2"
+                            class="mt-2 flex items-end gap-2 rounded-xl border border-slate-100 bg-slate-50/60 p-2"
                             @submit.prevent="confirmRelease(item.id)"
                         >
                             <div class="flex-1">
-                                <label class="block text-xs font-medium text-slate-600">Released to</label>
+                                <label class="field-label">Released to</label>
                                 <input
                                     v-model="releasedToDraft"
                                     type="text"
                                     required
                                     placeholder="Prisoner, family member, etc."
-                                    class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1 text-xs"
+                                    class="mt-1 field-input-sm text-xs"
                                 />
                             </div>
                             <button
                                 type="submit"
                                 :disabled="releasingId === item.id"
-                                class="rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
+                                class="btn-primary-sm"
                             >
                                 {{ releasingId === item.id ? 'Releasing…' : 'Confirm' }}
                             </button>

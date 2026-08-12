@@ -46,10 +46,10 @@ watch(search, () => {
 <template>
     <DashboardLayout>
         <div class="flex items-center justify-between">
-            <h1 class="text-xl font-semibold text-slate-900">Staff</h1>
+            <h1 class="text-2xl font-bold text-slate-900">Staff</h1>
             <router-link
                 :to="{ name: 'users.create' }"
-                class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                class="btn-primary"
             >
                 Add staff member
             </router-link>
@@ -59,14 +59,14 @@ watch(search, () => {
             v-model="search"
             type="search"
             placeholder="Search staff…"
-            class="mt-4 block w-full max-w-sm rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+            class="mt-4 field-input max-w-sm"
         />
 
-        <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <table class="min-w-full divide-y divide-slate-200 text-sm">
-                <thead class="bg-slate-50 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
+        <div class="mt-4 surface-shell">
+            <table class="w-full text-sm">
+                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
                     <tr>
-                        <th v-for="column in columns" :key="column.field" class="px-4 py-3">
+                        <th v-for="column in columns" :key="column.field" class="table-header-cell">
                             <button type="button" class="flex items-center gap-1 hover:text-slate-900" @click="toggleSort(column.field)">
                                 {{ column.label }}
                                 <span v-if="sort === column.field">{{ direction === 'asc' ? '↑' : '↓' }}</span>
@@ -74,11 +74,11 @@ watch(search, () => {
                         </th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody>
                     <tr
                         v-for="user in store.users"
                         :key="user.id"
-                        class="cursor-pointer hover:bg-slate-50"
+                        class="table-row cursor-pointer"
                         @click="$router.push({ name: 'users.show', params: { id: user.id } })"
                     >
                         <td class="px-4 py-3 font-medium text-slate-900">{{ user.name }}</td>
@@ -99,7 +99,7 @@ watch(search, () => {
                 <button
                     type="button"
                     :disabled="store.currentPage <= 1"
-                    class="rounded-md border border-slate-300 px-3 py-1 disabled:opacity-40"
+                    class="btn-secondary-sm"
                     @click="load(store.currentPage - 1)"
                 >
                     Previous
@@ -107,7 +107,7 @@ watch(search, () => {
                 <button
                     type="button"
                     :disabled="store.currentPage >= store.lastPage"
-                    class="rounded-md border border-slate-300 px-3 py-1 disabled:opacity-40"
+                    class="btn-secondary-sm"
                     @click="load(store.currentPage + 1)"
                 >
                     Next

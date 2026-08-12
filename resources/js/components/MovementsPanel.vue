@@ -54,34 +54,34 @@ onMounted(load);
 </script>
 
 <template>
-    <div class="rounded-lg border border-slate-200 bg-white p-6">
+    <div class="surface-card">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-700">Movements</h2>
             <button
                 v-if="auth.hasRole('officer', 'admin')"
                 type="button"
-                class="text-sm font-medium text-slate-900 hover:underline"
+                class="text-sm font-medium text-primary-600 hover:underline"
                 @click="showForm = !showForm"
             >
                 {{ showForm ? 'Cancel' : '+ Request movement' }}
             </button>
         </div>
 
-        <form v-if="showForm" class="mt-4 space-y-2 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submit">
+        <form v-if="showForm" class="mt-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submit">
             <div class="grid grid-cols-2 gap-2">
                 <input
                     v-model="form.from_location"
                     type="text"
                     required
                     placeholder="From (e.g. HMP Custodia)"
-                    class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                    class="field-input-sm"
                 />
                 <input
                     v-model="form.to_location"
                     type="text"
                     required
                     placeholder="To (e.g. Crown Court)"
-                    class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                    class="field-input-sm"
                 />
             </div>
             <div class="grid grid-cols-2 gap-2">
@@ -90,21 +90,21 @@ onMounted(load);
                     type="text"
                     required
                     placeholder="Reason"
-                    class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                    class="field-input-sm"
                 />
-                <input v-model="form.scheduled_at" type="datetime-local" required class="rounded-md border border-slate-300 px-2 py-1.5 text-sm" />
+                <input v-model="form.scheduled_at" type="datetime-local" required class="field-input-sm" />
             </div>
             <button
                 type="submit"
                 :disabled="submitting"
-                class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                class="btn-primary-sm"
             >
                 {{ submitting ? 'Requesting…' : 'Request movement' }}
             </button>
         </form>
 
         <ul class="mt-4 space-y-3">
-            <li v-for="movement in store.movements" :key="movement.id" class="rounded-md border border-slate-200 p-3 text-sm">
+            <li v-for="movement in store.movements" :key="movement.id" class="rounded-xl border border-slate-100 bg-white p-3 text-sm shadow-sm">
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="font-medium text-slate-900">{{ movement.from_location }} → {{ movement.to_location }}</p>

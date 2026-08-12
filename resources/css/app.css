@@ -4,6 +4,93 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-primary-50: #f5f3ff;
+    --color-primary-100: #ede9fe;
+    --color-primary-200: #ddd4fe;
+    --color-primary-300: #c3b2fd;
+    --color-primary-400: #a687fa;
+    --color-primary-500: #8b5cf6;
+    --color-primary-600: #7c3aed;
+    --color-primary-700: #6b28d9;
+    --color-primary-800: #5920b3;
+    --color-primary-900: #4a1d8f;
+}
+
+body {
+    background-color: var(--color-slate-50);
+}
+
+@layer components {
+    /* Surfaces */
+    .surface-card {
+        @apply rounded-2xl border border-slate-100 bg-white p-6 shadow-sm;
+    }
+
+    .surface-shell {
+        @apply overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        @apply inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary-600/25 transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn-secondary {
+        @apply inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn-danger {
+        @apply inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn-ghost {
+        @apply inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-primary-50 px-4 py-2.5 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn-primary-sm {
+        @apply inline-flex shrink-0 items-center justify-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-primary-600/25 transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn-secondary-sm {
+        @apply inline-flex shrink-0 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    /* Form fields */
+    .field-label {
+        @apply mb-1.5 block text-xs font-semibold tracking-wide text-slate-500;
+    }
+
+    .field-input {
+        @apply block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-4 focus:ring-primary-500/10 focus:outline-none;
+    }
+
+    .field-input-sm {
+        @apply block w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-4 focus:ring-primary-500/10 focus:outline-none;
+    }
+
+    /* Tabs / segmented control */
+    .tab-pill-active {
+        @apply rounded-lg bg-primary-600 px-3.5 py-1.5 text-sm font-medium text-white shadow-sm shadow-primary-600/25 transition;
+    }
+
+    .tab-pill-inactive {
+        @apply rounded-lg bg-primary-50 px-3.5 py-1.5 text-sm font-medium text-primary-700 transition hover:bg-primary-100;
+    }
+
+    /* Icon badge (stat card accents) */
+    .icon-badge {
+        @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white;
+    }
+
+    /* Table */
+    .table-header-cell {
+        @apply px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase;
+    }
+
+    .table-row {
+        @apply border-t border-slate-100 px-4 py-3 transition hover:bg-slate-50;
+    }
 }

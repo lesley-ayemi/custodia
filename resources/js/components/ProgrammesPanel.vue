@@ -97,47 +97,47 @@ onMounted(load);
 </script>
 
 <template>
-    <div class="rounded-lg border border-slate-200 bg-white p-6">
+    <div class="surface-card">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-700">Programmes</h2>
             <button
                 v-if="auth.hasRole('officer', 'admin')"
                 type="button"
-                class="text-sm font-medium text-slate-900 hover:underline"
+                class="text-sm font-medium text-primary-600 hover:underline"
                 @click="showEnrolForm = !showEnrolForm"
             >
                 {{ showEnrolForm ? 'Cancel' : '+ Enrol in programme' }}
             </button>
         </div>
 
-        <form v-if="showEnrolForm" class="mt-4 flex items-end gap-2 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submitEnrol">
+        <form v-if="showEnrolForm" class="mt-4 flex items-end gap-2 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submitEnrol">
             <div class="flex-1">
-                <label class="block text-xs font-medium text-slate-600">Programme</label>
-                <select v-model="enrolForm.programme_id" required class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm">
+                <label class="field-label">Programme</label>
+                <select v-model="enrolForm.programme_id" required class="mt-1 field-input-sm">
                     <option :value="null" disabled>Select a programme…</option>
                     <option v-for="programme in store.programmes" :key="programme.id" :value="programme.id">{{ programme.name }}</option>
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-600">Enrolled</label>
+                <label class="field-label">Enrolled</label>
                 <input
                     v-model="enrolForm.enrolled_at"
                     type="date"
                     required
-                    class="mt-1 block rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                    class="mt-1 field-input-sm"
                 />
             </div>
             <button
                 type="submit"
                 :disabled="enrolling"
-                class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                class="btn-primary-sm"
             >
                 {{ enrolling ? 'Enrolling…' : 'Enrol' }}
             </button>
         </form>
 
         <div class="mt-4 space-y-4">
-            <div v-for="enrolment in store.enrolments" :key="enrolment.id" class="rounded-md border border-slate-200 p-4">
+            <div v-for="enrolment in store.enrolments" :key="enrolment.id" class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-sm font-medium text-slate-900">{{ enrolment.programme_name }}</p>
@@ -171,17 +171,17 @@ onMounted(load);
 
                 <form
                     v-if="attendanceFormOpenFor === enrolment.id"
-                    class="mt-2 space-y-2 rounded-md bg-slate-50 p-3"
+                    class="mt-2 space-y-2 rounded-xl border border-slate-100 bg-slate-50/60 p-3"
                     @submit.prevent="submitAttendance(enrolment.id)"
                 >
                     <div class="flex items-end gap-2">
                         <div>
-                            <label class="block text-xs font-medium text-slate-600">Session date</label>
+                            <label class="field-label">Session date</label>
                             <input
                                 v-model="attendanceForm.session_date"
                                 type="date"
                                 required
-                                class="mt-1 rounded-md border border-slate-300 px-2 py-1 text-xs"
+                                class="mt-1 field-input-sm text-xs"
                             />
                         </div>
                         <label class="flex items-center gap-1.5 pb-1.5 text-xs text-slate-600">
@@ -193,12 +193,12 @@ onMounted(load);
                         v-model="attendanceForm.notes"
                         type="text"
                         placeholder="Notes (optional)"
-                        class="block w-full rounded-md border border-slate-300 px-2 py-1 text-xs"
+                        class="field-input-sm text-xs"
                     />
                     <button
                         type="submit"
                         :disabled="recordingAttendance"
-                        class="rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
+                        class="btn-primary-sm"
                     >
                         {{ recordingAttendance ? 'Saving…' : 'Save' }}
                     </button>
@@ -206,17 +206,17 @@ onMounted(load);
 
                 <form
                     v-if="withdrawFormOpenFor === enrolment.id"
-                    class="mt-2 flex items-end gap-2 rounded-md bg-slate-50 p-3"
+                    class="mt-2 flex items-end gap-2 rounded-xl border border-slate-100 bg-slate-50/60 p-3"
                     @submit.prevent="submitWithdraw(enrolment.id)"
                 >
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-slate-600">Reason (optional)</label>
-                        <input v-model="withdrawReason" type="text" class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1 text-xs" />
+                        <label class="field-label">Reason (optional)</label>
+                        <input v-model="withdrawReason" type="text" class="mt-1 field-input-sm text-xs" />
                     </div>
                     <button
                         type="submit"
                         :disabled="withdrawing"
-                        class="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                        class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
                     >
                         {{ withdrawing ? 'Withdrawing…' : 'Confirm withdraw' }}
                     </button>

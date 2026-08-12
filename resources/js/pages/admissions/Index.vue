@@ -39,11 +39,11 @@ onMounted(load);
 <template>
     <DashboardLayout>
         <div class="flex items-center justify-between">
-            <h1 class="text-xl font-semibold text-slate-900">Admissions</h1>
+            <h1 class="text-2xl font-bold text-slate-900">Admissions</h1>
             <router-link
                 v-if="auth.hasRole('officer', 'admin')"
                 :to="{ name: 'admissions.create' }"
-                class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800"
+                class="btn-primary-sm"
             >
                 Start admission
             </router-link>
@@ -54,20 +54,19 @@ onMounted(load);
                 v-for="tab in tabs"
                 :key="tab.label"
                 type="button"
-                class="rounded-full px-3 py-1 text-sm"
-                :class="statusFilter === tab.value ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                :class="statusFilter === tab.value ? 'tab-pill-active' : 'tab-pill-inactive'"
                 @click="setFilter(tab.value)"
             >
                 {{ tab.label }}
             </button>
         </div>
 
-        <div class="mt-6 divide-y divide-slate-100 rounded-lg border border-slate-200 bg-white">
+        <div class="mt-6 surface-shell">
             <router-link
                 v-for="admission in store.admissions"
                 :key="admission.id"
                 :to="{ name: 'admissions.show', params: { id: admission.id } }"
-                class="flex items-center justify-between px-4 py-3 hover:bg-slate-50"
+                class="table-row flex items-center justify-between px-4 py-3"
             >
                 <div>
                     <p class="text-sm font-medium text-slate-900">{{ admission.prisoner_name }}</p>

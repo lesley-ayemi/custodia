@@ -56,12 +56,12 @@ async function submit(): Promise<void> {
 
 <template>
     <DashboardLayout>
-        <h1 class="text-xl font-semibold text-slate-900">Report incident</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Report incident</h1>
 
         <form class="mt-6 max-w-lg space-y-4" @submit.prevent="submit">
             <div>
-                <label class="block text-sm font-medium text-slate-700">Prisoner</label>
-                <div v-if="selectedPrisoner" class="mt-1 flex items-center justify-between rounded-md border border-slate-300 px-3 py-2 text-sm">
+                <label class="field-label">Prisoner</label>
+                <div v-if="selectedPrisoner" class="mt-1 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm">
                     <span>{{ selectedPrisoner.full_name }} ({{ selectedPrisoner.prisoner_number }})</span>
                     <button type="button" class="text-slate-400 hover:text-slate-700" @click="selectedPrisoner = null; form.prisoner_id = null">
                         Change
@@ -72,9 +72,9 @@ async function submit(): Promise<void> {
                         v-model="prisonerSearch"
                         type="text"
                         placeholder="Search prisoner by name or number…"
-                        class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                        class="mt-1 field-input"
                     />
-                    <ul v-if="prisonerStore.prisoners.length > 0" class="mt-1 max-h-40 overflow-y-auto rounded-md border border-slate-200 text-sm">
+                    <ul v-if="prisonerStore.prisoners.length > 0" class="mt-1 max-h-40 overflow-y-auto rounded-xl border border-slate-200 text-sm shadow-sm">
                         <li
                             v-for="prisoner in prisonerStore.prisoners"
                             :key="prisoner.id"
@@ -89,8 +89,8 @@ async function submit(): Promise<void> {
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700">Type</label>
-                    <select v-model="form.type" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+                    <label class="field-label">Type</label>
+                    <select v-model="form.type" class="mt-1 field-input">
                         <option value="property_damage">Property Damage</option>
                         <option value="rule_violation">Rule Violation</option>
                         <option value="accident">Accident</option>
@@ -100,8 +100,8 @@ async function submit(): Promise<void> {
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700">Severity</label>
-                    <select v-model="form.severity" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+                    <label class="field-label">Severity</label>
+                    <select v-model="form.severity" class="mt-1 field-input">
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
                         <option value="high">High</option>
@@ -110,41 +110,41 @@ async function submit(): Promise<void> {
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700">Location</label>
-                <input v-model="form.location" type="text" required class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+                <label class="field-label">Location</label>
+                <input v-model="form.location" type="text" required class="mt-1 field-input" />
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700">Occurred at</label>
+                <label class="field-label">Occurred at</label>
                 <input
                     v-model="form.occurred_at"
                     type="datetime-local"
                     required
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    class="mt-1 field-input"
                 />
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700">Description</label>
+                <label class="field-label">Description</label>
                 <textarea
                     v-model="form.description"
                     rows="4"
                     required
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    class="mt-1 field-input"
                 />
             </div>
 
-            <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+            <p v-if="error" class="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{{ error }}</p>
 
             <div class="flex gap-3">
                 <button
                     type="submit"
                     :disabled="submitting || !form.prisoner_id"
-                    class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                    class="btn-primary disabled:opacity-50"
                 >
                     {{ submitting ? 'Saving…' : 'Report incident' }}
                 </button>
-                <router-link :to="{ name: 'incidents.index' }" class="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900">
+                <router-link :to="{ name: 'incidents.index' }" class="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900">
                     Cancel
                 </router-link>
             </div>

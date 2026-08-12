@@ -17,6 +17,7 @@
         "vue-tsc": "^3.3.9"
     },
     "dependencies": {
+        "@lucide/vue": "^1.31.0",
         "@vitejs/plugin-vue": "^6.0.8",
         "axios": "^1.19.0",
         "pinia": "^4.0.2",

@@ -15,25 +15,25 @@ onMounted(() => store.fetchUpcomingHearings());
 
 <template>
     <DashboardLayout>
-        <h1 class="text-xl font-semibold text-slate-900">Upcoming hearings</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Upcoming hearings</h1>
 
-        <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <table class="min-w-full divide-y divide-slate-200 text-sm">
-                <thead class="bg-slate-50 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
+        <div class="mt-4 surface-shell">
+            <table class="w-full text-sm">
+                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
                     <tr>
-                        <th class="px-4 py-3">Case #</th>
-                        <th class="px-4 py-3">Prisoner</th>
-                        <th class="px-4 py-3">Type</th>
-                        <th class="px-4 py-3">Scheduled</th>
-                        <th class="px-4 py-3">Location</th>
-                        <th class="px-4 py-3">Status</th>
+                        <th class="table-header-cell">Case #</th>
+                        <th class="table-header-cell">Prisoner</th>
+                        <th class="table-header-cell">Type</th>
+                        <th class="table-header-cell">Scheduled</th>
+                        <th class="table-header-cell">Location</th>
+                        <th class="table-header-cell">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody>
                     <tr
                         v-for="hearing in store.upcomingHearings"
                         :key="hearing.id"
-                        class="cursor-pointer hover:bg-slate-50"
+                        class="table-row cursor-pointer"
                         @click="$router.push({ name: 'prisoners.show', params: { id: hearing.prisoner_id } })"
                     >
                         <td class="px-4 py-3 font-medium text-slate-900">{{ hearing.case_number }}</td>

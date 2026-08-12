@@ -128,44 +128,44 @@ onMounted(load);
 
 <template>
     <div class="space-y-6">
-        <div class="rounded-lg border border-slate-200 bg-white p-6">
+        <div class="surface-card">
             <div class="flex items-center justify-between">
                 <h2 class="text-sm font-semibold text-slate-700">Medical records</h2>
-                <button type="button" class="text-sm font-medium text-slate-900 hover:underline" @click="showRecordForm = !showRecordForm">
+                <button type="button" class="text-sm font-medium text-primary-600 hover:underline" @click="showRecordForm = !showRecordForm">
                     {{ showRecordForm ? 'Cancel' : '+ Add record' }}
                 </button>
             </div>
 
-            <form v-if="showRecordForm" class="mt-4 space-y-2 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submitRecord">
+            <form v-if="showRecordForm" class="mt-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submitRecord">
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Condition</label>
+                    <label class="field-label">Condition</label>
                     <input
                         v-model="recordForm.condition"
                         type="text"
                         required
                         placeholder="Type 2 Diabetes"
-                        class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="mt-1 field-input-sm"
                     />
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-600">Clinical notes</label>
+                    <label class="field-label">Clinical notes</label>
                     <textarea
                         v-model="recordForm.notes"
                         rows="2"
-                        class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="mt-1 field-input-sm"
                     ></textarea>
                 </div>
                 <button
                     type="submit"
                     :disabled="busyKey === 'record'"
-                    class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                    class="btn-primary-sm"
                 >
                     {{ busyKey === 'record' ? 'Saving…' : 'Add record' }}
                 </button>
             </form>
 
             <ul class="mt-4 space-y-2">
-                <li v-for="record in store.records" :key="record.id" class="rounded-md border border-slate-200 p-3 text-sm">
+                <li v-for="record in store.records" :key="record.id" class="rounded-xl border border-slate-100 bg-white p-3 text-sm shadow-sm">
                     <p class="font-medium text-slate-900">{{ record.condition }}</p>
                     <p v-if="record.notes" class="mt-1 text-xs text-slate-500">{{ record.notes }}</p>
                     <p class="mt-1 text-xs text-slate-400">{{ record.recorded_by }} · {{ formatDate(record.recorded_at) }}</p>
@@ -174,17 +174,17 @@ onMounted(load);
             </ul>
         </div>
 
-        <div class="rounded-lg border border-slate-200 bg-white p-6">
+        <div class="surface-card">
             <div class="flex items-center justify-between">
                 <h2 class="text-sm font-semibold text-slate-700">Appointments</h2>
-                <button type="button" class="text-sm font-medium text-slate-900 hover:underline" @click="showAppointmentForm = !showAppointmentForm">
+                <button type="button" class="text-sm font-medium text-primary-600 hover:underline" @click="showAppointmentForm = !showAppointmentForm">
                     {{ showAppointmentForm ? 'Cancel' : '+ Schedule appointment' }}
                 </button>
             </div>
 
             <form
                 v-if="showAppointmentForm"
-                class="mt-4 space-y-2 rounded-md border border-slate-200 bg-slate-50 p-4"
+                class="mt-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/60 p-4"
                 @submit.prevent="submitAppointment"
             >
                 <div class="grid grid-cols-2 gap-2">
@@ -193,13 +193,13 @@ onMounted(load);
                         type="text"
                         required
                         placeholder="GP review"
-                        class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="field-input-sm"
                     />
                     <input
                         v-model="appointmentForm.provider"
                         type="text"
                         placeholder="Provider (optional)"
-                        class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="field-input-sm"
                     />
                 </div>
                 <div class="grid grid-cols-2 gap-2">
@@ -208,32 +208,32 @@ onMounted(load);
                         type="text"
                         required
                         placeholder="Health Wing"
-                        class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="field-input-sm"
                     />
                     <input
                         v-model="appointmentForm.scheduled_at"
                         type="datetime-local"
                         required
-                        class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="field-input-sm"
                     />
                 </div>
                 <textarea
                     v-model="appointmentForm.notes"
                     rows="2"
                     placeholder="Notes (optional)"
-                    class="block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                    class="field-input-sm"
                 ></textarea>
                 <button
                     type="submit"
                     :disabled="busyKey === 'appointment'"
-                    class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                    class="btn-primary-sm"
                 >
                     {{ busyKey === 'appointment' ? 'Scheduling…' : 'Schedule' }}
                 </button>
             </form>
 
             <ul class="mt-4 space-y-2">
-                <li v-for="appointment in store.appointments" :key="appointment.id" class="rounded-md border border-slate-200 p-3 text-sm">
+                <li v-for="appointment in store.appointments" :key="appointment.id" class="rounded-xl border border-slate-100 bg-white p-3 text-sm shadow-sm">
                     <div class="flex items-start justify-between">
                         <div>
                             <p class="font-medium text-slate-900">{{ appointment.appointment_type }}</p>
@@ -267,17 +267,17 @@ onMounted(load);
             </ul>
         </div>
 
-        <div class="rounded-lg border border-slate-200 bg-white p-6">
+        <div class="surface-card">
             <div class="flex items-center justify-between">
                 <h2 class="text-sm font-semibold text-slate-700">Prescriptions</h2>
-                <button type="button" class="text-sm font-medium text-slate-900 hover:underline" @click="showPrescriptionForm = !showPrescriptionForm">
+                <button type="button" class="text-sm font-medium text-primary-600 hover:underline" @click="showPrescriptionForm = !showPrescriptionForm">
                     {{ showPrescriptionForm ? 'Cancel' : '+ Prescribe' }}
                 </button>
             </div>
 
             <form
                 v-if="showPrescriptionForm"
-                class="mt-4 space-y-2 rounded-md border border-slate-200 bg-slate-50 p-4"
+                class="mt-4 space-y-2 rounded-xl border border-slate-100 bg-slate-50/60 p-4"
                 @submit.prevent="submitPrescription"
             >
                 <div class="grid grid-cols-2 gap-2">
@@ -286,14 +286,14 @@ onMounted(load);
                         type="text"
                         required
                         placeholder="Metformin"
-                        class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="field-input-sm"
                     />
                     <input
                         v-model="prescriptionForm.dosage"
                         type="text"
                         required
                         placeholder="500mg"
-                        class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="field-input-sm"
                     />
                 </div>
                 <div class="grid grid-cols-3 gap-2">
@@ -302,38 +302,38 @@ onMounted(load);
                         type="text"
                         required
                         placeholder="Twice daily"
-                        class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="field-input-sm"
                     />
                     <input
                         v-model="prescriptionForm.administration_time"
                         type="time"
                         placeholder="Time (optional)"
-                        class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="field-input-sm"
                     />
                     <input
                         v-model="prescriptionForm.start_date"
                         type="date"
                         required
-                        class="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                        class="field-input-sm"
                     />
                 </div>
                 <textarea
                     v-model="prescriptionForm.notes"
                     rows="2"
                     placeholder="Notes (optional)"
-                    class="block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                    class="field-input-sm"
                 ></textarea>
                 <button
                     type="submit"
                     :disabled="busyKey === 'prescription'"
-                    class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                    class="btn-primary-sm"
                 >
                     {{ busyKey === 'prescription' ? 'Saving…' : 'Prescribe' }}
                 </button>
             </form>
 
             <ul class="mt-4 space-y-2">
-                <li v-for="prescription in store.prescriptions" :key="prescription.id" class="rounded-md border border-slate-200 p-3 text-sm">
+                <li v-for="prescription in store.prescriptions" :key="prescription.id" class="rounded-xl border border-slate-100 bg-white p-3 text-sm shadow-sm">
                     <div class="flex items-start justify-between">
                         <div>
                             <p class="font-medium text-slate-900">{{ prescription.medication_name }} · {{ prescription.dosage }}</p>

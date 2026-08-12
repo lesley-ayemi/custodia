@@ -88,12 +88,12 @@ onMounted(load);
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-sm font-medium text-slate-500">{{ prisoner.prisoner_number }}</p>
-                    <h1 class="text-2xl font-semibold text-slate-900">{{ prisoner.full_name }}</h1>
+                    <h1 class="text-2xl font-bold text-slate-900">{{ prisoner.full_name }}</h1>
                 </div>
                 <StatusBadge :status="prisoner.status" />
             </div>
 
-            <div class="mt-6 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-4 rounded-lg border border-slate-200 bg-white p-6 text-sm">
+            <div class="mt-6 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-4 surface-card text-sm">
                 <div>
                     <dt class="text-slate-500">Date of birth</dt>
                     <dd class="mt-1 font-medium text-slate-900">{{ formatDate(prisoner.date_of_birth) }}</dd>
@@ -117,7 +117,7 @@ onMounted(load);
             </div>
 
             <div v-if="canSeeCustodyOperations" class="mt-6 grid max-w-4xl grid-cols-2 gap-6">
-                <div class="rounded-lg border border-slate-200 bg-white p-6">
+                <div class="surface-card">
                     <h2 class="text-sm font-semibold text-slate-700">Current cell</h2>
                     <p v-if="prisoner.current_cell" class="mt-2 text-lg font-medium text-slate-900">
                         {{ prisoner.current_cell.block_name }} / {{ prisoner.current_cell.wing_name }} / {{ prisoner.current_cell.cell_code }}
@@ -125,7 +125,7 @@ onMounted(load);
                     <p v-else class="mt-2 text-sm text-slate-500">Not currently housed.</p>
 
                     <div v-if="auth.hasRole('officer', 'admin')" class="mt-4 flex items-center gap-2">
-                        <select v-model="selectedCellId" class="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+                        <select v-model="selectedCellId" class="field-input">
                             <option :value="null">Select a cell…</option>
                             <option v-for="cell in availableCells" :key="cell.id" :value="cell.id">
                                 {{ cell.blockName }} / {{ cell.wingName }} / {{ cell.code }} ({{ cell.available }} free)
@@ -134,7 +134,7 @@ onMounted(load);
                         <button
                             type="button"
                             :disabled="!selectedCellId || assigning"
-                            class="shrink-0 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                            class="btn-primary-sm"
                             @click="assignCell"
                         >
                             {{ assigning ? 'Assigning…' : 'Assign' }}
@@ -142,7 +142,7 @@ onMounted(load);
                     </div>
                 </div>
 
-                <div class="rounded-lg border border-slate-200 bg-white p-6">
+                <div class="surface-card">
                     <h2 class="text-sm font-semibold text-slate-700">Housing history</h2>
                     <div class="mt-4">
                         <HousingHistoryTimeline :history="history" />
@@ -186,7 +186,7 @@ onMounted(load);
                 <button
                     type="button"
                     :disabled="archiving"
-                    class="rounded-md border border-red-200 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
+                    class="btn-danger"
                     @click="archive"
                 >
                     {{ archiving ? 'Archiving…' : 'Archive prisoner' }}

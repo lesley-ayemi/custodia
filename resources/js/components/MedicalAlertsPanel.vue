@@ -73,33 +73,33 @@ onMounted(load);
 </script>
 
 <template>
-    <div class="rounded-lg border border-slate-200 bg-white p-6">
+    <div class="surface-card">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-700">Medical alerts</h2>
             <button
                 v-if="auth.hasRole('medical', 'admin')"
                 type="button"
-                class="text-sm font-medium text-slate-900 hover:underline"
+                class="text-sm font-medium text-primary-600 hover:underline"
                 @click="showForm = !showForm"
             >
                 {{ showForm ? 'Cancel' : '+ Add alert' }}
             </button>
         </div>
 
-        <form v-if="showForm" class="mt-4 flex items-end gap-2 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submit">
+        <form v-if="showForm" class="mt-4 flex items-end gap-2 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submit">
             <div class="flex-1">
-                <label class="block text-xs font-medium text-slate-600">Message</label>
+                <label class="field-label">Message</label>
                 <input
                     v-model="form.message"
                     type="text"
                     required
                     placeholder="Requires medication at 14:00"
-                    class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                    class="mt-1 field-input-sm"
                 />
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-600">Severity</label>
-                <select v-model="form.severity" class="mt-1 block rounded-md border border-slate-300 px-2 py-1.5 text-sm">
+                <label class="field-label">Severity</label>
+                <select v-model="form.severity" class="mt-1 field-input-sm">
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
                     <option value="high">High</option>
@@ -108,18 +108,18 @@ onMounted(load);
             <button
                 type="submit"
                 :disabled="submitting"
-                class="shrink-0 rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                class="btn-primary-sm"
             >
                 {{ submitting ? 'Saving…' : 'Add' }}
             </button>
         </form>
 
         <ul class="mt-4 space-y-2">
-            <li v-for="alert in store.alerts" :key="alert.id" class="rounded-md border border-slate-200 p-3">
+            <li v-for="alert in store.alerts" :key="alert.id" class="rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
                 <template v-if="editingId === alert.id">
                     <div class="flex items-end gap-2">
-                        <input v-model="editForm.message" type="text" class="flex-1 rounded-md border border-slate-300 px-2 py-1 text-sm" />
-                        <select v-model="editForm.severity" class="rounded-md border border-slate-300 px-2 py-1 text-sm">
+                        <input v-model="editForm.message" type="text" class="field-input-sm flex-1" />
+                        <select v-model="editForm.severity" class="field-input-sm">
                             <option value="low">Low</option>
                             <option value="medium">Medium</option>
                             <option value="high">High</option>

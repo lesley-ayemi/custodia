@@ -72,53 +72,53 @@ onMounted(load);
 <template>
     <DashboardLayout>
         <div class="flex items-center justify-between">
-            <h1 class="text-xl font-semibold text-slate-900">Visitors</h1>
+            <h1 class="text-2xl font-bold text-slate-900">Visitors</h1>
             <button
                 v-if="auth.hasRole('officer', 'admin')"
                 type="button"
-                class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                class="btn-primary"
                 @click="showForm = !showForm"
             >
                 {{ showForm ? 'Cancel' : '+ Register visitor' }}
             </button>
         </div>
 
-        <p v-if="error" class="mt-3 text-sm text-red-600">{{ error }}</p>
+        <p v-if="error" class="mt-3 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{{ error }}</p>
 
-        <form v-if="showForm" class="mt-4 space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4" @submit.prevent="submit">
+        <form v-if="showForm" class="mt-4 space-y-3 rounded-xl border border-slate-100 bg-slate-50/60 p-4" @submit.prevent="submit">
             <div class="grid grid-cols-2 gap-3">
-                <input v-model="form.name" type="text" required placeholder="Full name" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm" />
-                <input v-model="form.date_of_birth" type="date" required class="rounded-md border border-slate-300 px-3 py-1.5 text-sm" />
+                <input v-model="form.name" type="text" required placeholder="Full name" class="field-input-sm" />
+                <input v-model="form.date_of_birth" type="date" required class="field-input-sm" />
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <select v-model="form.id_type" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm">
+                <select v-model="form.id_type" class="field-input-sm">
                     <option v-for="t in idTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
                 </select>
-                <input v-model="form.id_number" type="text" required placeholder="ID number" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm" />
+                <input v-model="form.id_number" type="text" required placeholder="ID number" class="field-input-sm" />
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <input v-model="form.phone" type="text" required placeholder="Phone" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm" />
-                <input v-model="form.email" type="email" placeholder="Email (optional)" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm" />
+                <input v-model="form.phone" type="text" required placeholder="Phone" class="field-input-sm" />
+                <input v-model="form.email" type="email" placeholder="Email (optional)" class="field-input-sm" />
             </div>
-            <input v-model="form.address" type="text" placeholder="Address (optional)" class="block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm" />
-            <button type="submit" :disabled="busy" class="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50">
+            <input v-model="form.address" type="text" placeholder="Address (optional)" class="field-input-sm" />
+            <button type="submit" :disabled="busy" class="btn-primary-sm">
                 Register
             </button>
         </form>
 
-        <div class="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <table class="min-w-full divide-y divide-slate-200 text-sm">
-                <thead class="bg-slate-50 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
+        <div class="mt-6 surface-shell">
+            <table class="w-full text-sm">
+                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
                     <tr>
-                        <th class="px-4 py-3">Name</th>
-                        <th class="px-4 py-3">Date of birth</th>
-                        <th class="px-4 py-3">ID</th>
-                        <th class="px-4 py-3">Phone</th>
-                        <th class="px-4 py-3">Status</th>
+                        <th class="table-header-cell">Name</th>
+                        <th class="table-header-cell">Date of birth</th>
+                        <th class="table-header-cell">ID</th>
+                        <th class="table-header-cell">Phone</th>
+                        <th class="table-header-cell">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
-                    <tr v-for="visitor in store.visitors" :key="visitor.id">
+                <tbody>
+                    <tr v-for="visitor in store.visitors" :key="visitor.id" class="table-row">
                         <td class="px-4 py-3 font-medium text-slate-900">{{ visitor.name }}</td>
                         <td class="px-4 py-3 text-slate-500">{{ formatDate(visitor.date_of_birth) }}</td>
                         <td class="px-4 py-3 text-slate-500">{{ visitor.id_number }}</td>
