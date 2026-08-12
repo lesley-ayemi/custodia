@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\HousingAssignmentController;
 use App\Http\Controllers\Api\IncidentController;
 use App\Http\Controllers\Api\LegalRepresentativeController;
 use App\Http\Controllers\Api\PrisonerController;
+use App\Http\Controllers\Api\PropertyItemController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,4 +47,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/legal-representatives', [LegalRepresentativeController::class, 'index']);
     Route::post('/legal-representatives', [LegalRepresentativeController::class, 'store']);
+
+    Route::get('/prisoners/{prisoner}/property', [PropertyItemController::class, 'indexForPrisoner']);
+    Route::post('/prisoners/{prisoner}/property', [PropertyItemController::class, 'store']);
+    Route::post('/property-items/{propertyItem}/release', [PropertyItemController::class, 'release']);
 });
