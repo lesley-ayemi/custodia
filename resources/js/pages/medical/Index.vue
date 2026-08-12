@@ -1,12 +1,29 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import DashboardLayout from '../../layouts/DashboardLayout.vue';
+import DataTable from '../../components/DataTable.vue';
+import type { DataTableColumn } from '../../components/DataTable.vue';
 import { useMedicalStore } from '../../stores/medical';
+import type { MedicalAppointment } from '../../types/medical';
 
 const store = useMedicalStore();
+const router = useRouter();
+
+const columns: DataTableColumn[] = [
+    { key: 'prisoner_name', label: 'Prisoner', sortable: true },
+    { key: 'appointment_type', label: 'Type' },
+    { key: 'scheduled_at', label: 'Scheduled', sortable: true },
+    { key: 'location', label: 'Location' },
+    { key: 'provider', label: 'Provider' },
+];
 
 function formatDateTime(value: string): string {
     return new Date(value).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function openPrisoner(row: Record<string, unknown>): void {
+    router.push({ name: 'prisoners.show', params: { id: (row as unknown as MedicalAppointment).prisoner_id } });
 }
 
 onMounted(() => store.fetchUpcomingAppointments());
@@ -16,35 +33,33 @@ onMounted(() => store.fetchUpcomingAppointments());
     <DashboardLayout>
         <h1 class="text-2xl font-bold text-slate-900">Upcoming appointments</h1>
 
-        <div class="mt-4 surface-shell">
-            <table class="w-full text-sm">
-                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
-                    <tr>
-                        <th class="table-header-cell">Prisoner</th>
-                        <th class="table-header-cell">Type</th>
-                        <th class="table-header-cell">Scheduled</th>
-                        <th class="table-header-cell">Location</th>
-                        <th class="table-header-cell">Provider</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="appointment in store.upcomingAppointments"
-                        :key="appointment.id"
-                        class="table-row cursor-pointer"
-                        @click="$router.push({ name: 'prisoners.show', params: { id: appointment.prisoner_id } })"
-                    >
-                        <td class="px-4 py-3 font-medium text-slate-900">{{ appointment.prisoner_name }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ appointment.appointment_type }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ formatDateTime(appointment.scheduled_at) }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ appointment.location }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ appointment.provider ?? '—' }}</td>
-                    </tr>
-                    <tr v-if="!store.loading && store.upcomingAppointments.length === 0">
-                        <td colspan="5" class="px-4 py-6 text-center text-slate-500">No upcoming appointments scheduled.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="mt-4">
+            <DataTable
+                :columns="columns"
+                :rows="store.upcomingAppointments as unknown as Record<string, unknown>[]"
+                :loading="store.loading"
+                empty-message="No upcoming appointments scheduled."
+                searchable
+                search-placeholder="Search appointments…"
+                clickable-rows
+                @row-click="openPrisoner"
+            >
+                <template #cell-prisoner_name="{ value }">
+                    <span class="font-medium text-slate-900">{{ value }}</span>
+                </template>
+                <template #cell-appointment_type="{ value }">
+                    <span class="text-slate-500">{{ value }}</span>
+                </template>
+                <template #cell-scheduled_at="{ value }">
+                    <span class="text-slate-500">{{ formatDateTime(value as string) }}</span>
+                </template>
+                <template #cell-location="{ value }">
+                    <span class="text-slate-500">{{ value }}</span>
+                </template>
+                <template #cell-provider="{ value }">
+                    <span class="text-slate-500">{{ value ?? '—' }}</span>
+                </template>
+            </DataTable>
         </div>
     </DashboardLayout>
 </template>

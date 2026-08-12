@@ -1,14 +1,26 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import DashboardLayout from '../../layouts/DashboardLayout.vue';
 import StatusBadge from '../../components/StatusBadge.vue';
+import DataTable from '../../components/DataTable.vue';
+import type { DataTableColumn } from '../../components/DataTable.vue';
 import { usePrisonerStore } from '../../stores/prisoner';
 import { useAuthStore } from '../../stores/auth';
+import type { Prisoner } from '../../types/prisoner';
 
 const store = usePrisonerStore();
 const auth = useAuthStore();
+const router = useRouter();
 const search = ref('');
 let searchTimeout: ReturnType<typeof setTimeout> | undefined;
+
+const columns: DataTableColumn[] = [
+    { key: 'prisoner_number', label: 'Prisoner #', sortable: true },
+    { key: 'full_name', label: 'Name', sortable: true },
+    { key: 'admission_date', label: 'Admission', sortable: true },
+    { key: 'status', label: 'Status' },
+];
 
 onMounted(() => store.fetchList());
 
@@ -19,6 +31,10 @@ watch(search, (value) => {
 
 function goToPage(page: number): void {
     store.fetchList(search.value, page);
+}
+
+function openPrisoner(row: Record<string, unknown>): void {
+    router.push({ name: 'prisoners.show', params: { id: (row as unknown as Prisoner).id } });
 }
 </script>
 
@@ -42,33 +58,22 @@ function goToPage(page: number): void {
             class="mt-4 field-input max-w-sm"
         />
 
-        <div class="mt-4 surface-shell">
-            <table class="w-full text-sm">
-                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
-                    <tr>
-                        <th class="table-header-cell">Prisoner #</th>
-                        <th class="table-header-cell">Name</th>
-                        <th class="table-header-cell">Admission</th>
-                        <th class="table-header-cell">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="prisoner in store.prisoners"
-                        :key="prisoner.id"
-                        class="table-row cursor-pointer"
-                        @click="$router.push({ name: 'prisoners.show', params: { id: prisoner.id } })"
-                    >
-                        <td class="px-4 py-3 font-medium text-slate-900">{{ prisoner.prisoner_number }}</td>
-                        <td class="px-4 py-3 text-slate-700">{{ prisoner.full_name }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ prisoner.admission_date }}</td>
-                        <td class="px-4 py-3"><StatusBadge :status="prisoner.status" /></td>
-                    </tr>
-                    <tr v-if="!store.loading && store.prisoners.length === 0">
-                        <td colspan="4" class="px-4 py-6 text-center text-slate-500">No prisoners found.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="mt-4">
+            <DataTable
+                :columns="columns"
+                :rows="store.prisoners as unknown as Record<string, unknown>[]"
+                :loading="store.loading"
+                empty-message="No prisoners found."
+                clickable-rows
+                @row-click="openPrisoner"
+            >
+                <template #cell-prisoner_number="{ value }">
+                    <span class="font-medium text-slate-900">{{ value }}</span>
+                </template>
+                <template #cell-status="{ row }">
+                    <StatusBadge :status="(row as unknown as Prisoner).status" />
+                </template>
+            </DataTable>
         </div>
 
         <div v-if="store.lastPage > 1" class="mt-4 flex items-center justify-between text-sm text-slate-600">

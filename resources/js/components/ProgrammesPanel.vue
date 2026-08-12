@@ -185,7 +185,11 @@ onMounted(load);
                             />
                         </div>
                         <label class="flex items-center gap-1.5 pb-1.5 text-xs text-slate-600">
-                            <input v-model="attendanceForm.attended" type="checkbox" />
+                            <input
+                                v-model="attendanceForm.attended"
+                                type="checkbox"
+                                class="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500/30"
+                            />
                             Attended
                         </label>
                     </div>

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import DashboardLayout from '../../layouts/DashboardLayout.vue';
 import StatusBadge from '../../components/StatusBadge.vue';
+import DataTable from '../../components/DataTable.vue';
+import type { DataTableColumn } from '../../components/DataTable.vue';
 import { useIncidentStore } from '../../stores/incident';
 import { useAuthStore } from '../../stores/auth';
-import type { IncidentStatus } from '../../types/incident';
+import type { Incident, IncidentStatus } from '../../types/incident';
 
 const store = useIncidentStore();
 const auth = useAuthStore();
@@ -17,6 +19,22 @@ const tabs: { label: string; value: IncidentStatus | '' }[] = [
     { label: 'Under Review', value: 'under_review' },
     { label: 'Resolved', value: 'resolved' },
 ];
+
+const columns = computed<DataTableColumn[]>(() => {
+    const base: DataTableColumn[] = [
+        { key: 'incident_number', label: 'Incident #', sortable: true },
+        { key: 'prisoner_name', label: 'Prisoner', sortable: true },
+        { key: 'type', label: 'Type' },
+        { key: 'severity', label: 'Severity', sortable: true },
+        { key: 'occurred_at', label: 'Occurred', sortable: true },
+        { key: 'status', label: 'Status' },
+    ];
+
+    if (auth.hasRole('supervisor', 'admin')) base.push({ key: 'actions', label: 'Actions' });
+    if (auth.hasRole('admin')) base.push({ key: 'edit', label: '' });
+
+    return base;
+});
 
 function load(): void {
     store.fetchList(statusFilter.value);
@@ -79,59 +97,59 @@ onMounted(load);
             </button>
         </div>
 
-        <div class="mt-4 surface-shell">
-            <table class="w-full text-sm">
-                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
-                    <tr>
-                        <th class="table-header-cell">Incident #</th>
-                        <th class="table-header-cell">Prisoner</th>
-                        <th class="table-header-cell">Type</th>
-                        <th class="table-header-cell">Severity</th>
-                        <th class="table-header-cell">Occurred</th>
-                        <th class="table-header-cell">Status</th>
-                        <th v-if="auth.hasRole('supervisor', 'admin')" class="table-header-cell">Actions</th>
-                        <th v-if="auth.hasRole('admin')" class="table-header-cell"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="incident in store.incidents" :key="incident.id" class="table-row">
-                        <td class="px-4 py-3 font-medium text-slate-900">{{ incident.incident_number }}</td>
-                        <td class="px-4 py-3 text-slate-700">{{ incident.prisoner_name }}</td>
-                        <td class="px-4 py-3 text-slate-500 capitalize">{{ incident.type.replaceAll('_', ' ') }}</td>
-                        <td class="px-4 py-3 text-slate-500 capitalize">{{ incident.severity }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ formatDate(incident.occurred_at) }}</td>
-                        <td class="px-4 py-3"><StatusBadge :status="incident.status" /></td>
-                        <td v-if="auth.hasRole('supervisor', 'admin')" class="space-x-2 px-4 py-3">
-                            <button
-                                v-if="incident.status === 'reported'"
-                                type="button"
-                                :disabled="actingId === incident.id"
-                                class="text-primary-600 hover:underline disabled:opacity-50"
-                                @click="review(incident.id)"
-                            >
-                                Review
-                            </button>
-                            <button
-                                v-if="incident.status === 'under_review'"
-                                type="button"
-                                :disabled="actingId === incident.id"
-                                class="text-emerald-700 hover:underline disabled:opacity-50"
-                                @click="resolve(incident.id)"
-                            >
-                                Resolve
-                            </button>
-                        </td>
-                        <td v-if="auth.hasRole('admin')" class="px-4 py-3">
-                            <router-link :to="{ name: 'incidents.edit', params: { id: incident.id } }" class="text-slate-600 hover:underline">
-                                Edit
-                            </router-link>
-                        </td>
-                    </tr>
-                    <tr v-if="!store.loading && store.incidents.length === 0">
-                        <td colspan="8" class="px-4 py-6 text-center text-slate-500">No incidents found.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="mt-4">
+            <DataTable
+                :columns="columns"
+                :rows="store.incidents as unknown as Record<string, unknown>[]"
+                :loading="store.loading"
+                empty-message="No incidents found."
+                searchable
+                search-placeholder="Search incidents…"
+            >
+                <template #cell-incident_number="{ value }">
+                    <span class="font-medium text-slate-900">{{ value }}</span>
+                </template>
+                <template #cell-type="{ value }">
+                    <span class="text-slate-500 capitalize">{{ String(value).replaceAll('_', ' ') }}</span>
+                </template>
+                <template #cell-severity="{ value }">
+                    <span class="text-slate-500 capitalize">{{ value }}</span>
+                </template>
+                <template #cell-occurred_at="{ value }">
+                    <span class="text-slate-500">{{ formatDate(value as string) }}</span>
+                </template>
+                <template #cell-status="{ row }">
+                    <StatusBadge :status="(row as unknown as Incident).status" />
+                </template>
+                <template #cell-actions="{ row }">
+                    <button
+                        v-if="(row as unknown as Incident).status === 'reported'"
+                        type="button"
+                        :disabled="actingId === (row as unknown as Incident).id"
+                        class="text-primary-600 hover:underline disabled:opacity-50"
+                        @click="review((row as unknown as Incident).id)"
+                    >
+                        Review
+                    </button>
+                    <button
+                        v-if="(row as unknown as Incident).status === 'under_review'"
+                        type="button"
+                        :disabled="actingId === (row as unknown as Incident).id"
+                        class="text-emerald-700 hover:underline disabled:opacity-50"
+                        @click="resolve((row as unknown as Incident).id)"
+                    >
+                        Resolve
+                    </button>
+                </template>
+                <template #cell-edit="{ row }">
+                    <router-link
+                        :to="{ name: 'incidents.edit', params: { id: (row as unknown as Incident).id } }"
+                        class="text-slate-600 hover:underline"
+                    >
+                        Edit
+                    </router-link>
+                </template>
+            </DataTable>
         </div>
     </DashboardLayout>
 </template>

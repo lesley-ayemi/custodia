@@ -1,38 +1,43 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import DashboardLayout from '../../layouts/DashboardLayout.vue';
+import DataTable from '../../components/DataTable.vue';
+import type { DataTableColumn } from '../../components/DataTable.vue';
 import { useUserStore, type SortDirection, type SortField } from '../../stores/user';
+import type { StaffUser } from '../../types/user';
 
 const store = useUserStore();
+const router = useRouter();
 const search = ref('');
 const sort = ref<SortField>('name');
 const direction = ref<SortDirection>('asc');
 let searchTimeout: ReturnType<typeof setTimeout> | undefined;
 
-const columns: { field: SortField; label: string }[] = [
-    { field: 'name', label: 'Name' },
-    { field: 'email', label: 'Email' },
-    { field: 'role', label: 'Role' },
-    { field: 'created_at', label: 'Joined' },
+const columns: DataTableColumn[] = [
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'email', label: 'Email', sortable: true },
+    { key: 'role', label: 'Role', sortable: true },
+    { key: 'created_at', label: 'Joined', sortable: true },
 ];
 
 function load(page = 1): void {
     store.fetchList(search.value, sort.value, direction.value, page);
 }
 
-function toggleSort(field: SortField): void {
-    if (sort.value === field) {
-        direction.value = direction.value === 'asc' ? 'desc' : 'asc';
-    } else {
-        sort.value = field;
-        direction.value = 'asc';
-    }
+function onSort({ key, direction: dir }: { key: string; direction: 'asc' | 'desc' }): void {
+    sort.value = key as SortField;
+    direction.value = dir;
     load();
 }
 
 function formatDate(value: string | null): string {
     if (!value) return '—';
     return new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function openUser(row: Record<string, unknown>): void {
+    router.push({ name: 'users.show', params: { id: (row as unknown as StaffUser).id } });
 }
 
 onMounted(() => load());
@@ -62,35 +67,30 @@ watch(search, () => {
             class="mt-4 field-input max-w-sm"
         />
 
-        <div class="mt-4 surface-shell">
-            <table class="w-full text-sm">
-                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
-                    <tr>
-                        <th v-for="column in columns" :key="column.field" class="table-header-cell">
-                            <button type="button" class="flex items-center gap-1 hover:text-slate-900" @click="toggleSort(column.field)">
-                                {{ column.label }}
-                                <span v-if="sort === column.field">{{ direction === 'asc' ? '↑' : '↓' }}</span>
-                            </button>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="user in store.users"
-                        :key="user.id"
-                        class="table-row cursor-pointer"
-                        @click="$router.push({ name: 'users.show', params: { id: user.id } })"
-                    >
-                        <td class="px-4 py-3 font-medium text-slate-900">{{ user.name }}</td>
-                        <td class="px-4 py-3 text-slate-600">{{ user.email }}</td>
-                        <td class="px-4 py-3 text-slate-600 capitalize">{{ user.role }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ formatDate(user.created_at) }}</td>
-                    </tr>
-                    <tr v-if="!store.loading && store.users.length === 0">
-                        <td colspan="4" class="px-4 py-6 text-center text-slate-500">No staff found.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="mt-4">
+            <DataTable
+                :columns="columns"
+                :rows="store.users as unknown as Record<string, unknown>[]"
+                :loading="store.loading"
+                empty-message="No staff found."
+                clickable-rows
+                server-sort
+                @row-click="openUser"
+                @sort="onSort"
+            >
+                <template #cell-name="{ value }">
+                    <span class="font-medium text-slate-900">{{ value }}</span>
+                </template>
+                <template #cell-email="{ value }">
+                    <span class="text-slate-600">{{ value }}</span>
+                </template>
+                <template #cell-role="{ value }">
+                    <span class="text-slate-600 capitalize">{{ value }}</span>
+                </template>
+                <template #cell-created_at="{ value }">
+                    <span class="text-slate-500">{{ formatDate(value as string) }}</span>
+                </template>
+            </DataTable>
         </div>
 
         <div v-if="store.lastPage > 1" class="mt-4 flex items-center justify-between text-sm text-slate-600">

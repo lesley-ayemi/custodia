@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import DashboardLayout from '../../layouts/DashboardLayout.vue';
+import DataTable from '../../components/DataTable.vue';
+import type { DataTableColumn } from '../../components/DataTable.vue';
 import { useVisitorStore } from '../../stores/visitor';
 import { useAuthStore } from '../../stores/auth';
-import type { VisitorFormData, VisitorIdType } from '../../types/visitor';
+import type { Visitor, VisitorFormData, VisitorIdType } from '../../types/visitor';
 
 const store = useVisitorStore();
 const auth = useAuthStore();
@@ -17,6 +19,14 @@ const idTypes: { value: VisitorIdType; label: string }[] = [
     { value: 'driving_licence', label: 'Driving licence' },
     { value: 'national_id', label: 'National ID' },
     { value: 'other', label: 'Other' },
+];
+
+const columns: DataTableColumn[] = [
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'date_of_birth', label: 'Date of birth', sortable: true },
+    { key: 'id_number', label: 'ID' },
+    { key: 'phone', label: 'Phone' },
+    { key: 'status', label: 'Status' },
 ];
 
 const form = reactive<VisitorFormData>({
@@ -106,35 +116,37 @@ onMounted(load);
             </button>
         </form>
 
-        <div class="mt-6 surface-shell">
-            <table class="w-full text-sm">
-                <thead class="border-b border-slate-100 bg-slate-50/60 text-left">
-                    <tr>
-                        <th class="table-header-cell">Name</th>
-                        <th class="table-header-cell">Date of birth</th>
-                        <th class="table-header-cell">ID</th>
-                        <th class="table-header-cell">Phone</th>
-                        <th class="table-header-cell">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="visitor in store.visitors" :key="visitor.id" class="table-row">
-                        <td class="px-4 py-3 font-medium text-slate-900">{{ visitor.name }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ formatDate(visitor.date_of_birth) }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ visitor.id_number }}</td>
-                        <td class="px-4 py-3 text-slate-500">{{ visitor.phone }}</td>
-                        <td class="px-4 py-3">
-                            <span v-if="visitor.banned_at" class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                                Banned
-                            </span>
-                            <span v-else class="text-xs text-slate-400">—</span>
-                        </td>
-                    </tr>
-                    <tr v-if="!store.loading && store.visitors.length === 0">
-                        <td colspan="5" class="px-4 py-6 text-center text-slate-500">No visitors registered.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="mt-6">
+            <DataTable
+                :columns="columns"
+                :rows="store.visitors as unknown as Record<string, unknown>[]"
+                :loading="store.loading"
+                empty-message="No visitors registered."
+                searchable
+                search-placeholder="Search visitors…"
+            >
+                <template #cell-name="{ value }">
+                    <span class="font-medium text-slate-900">{{ value }}</span>
+                </template>
+                <template #cell-date_of_birth="{ value }">
+                    <span class="text-slate-500">{{ formatDate(value as string) }}</span>
+                </template>
+                <template #cell-id_number="{ value }">
+                    <span class="text-slate-500">{{ value }}</span>
+                </template>
+                <template #cell-phone="{ value }">
+                    <span class="text-slate-500">{{ value }}</span>
+                </template>
+                <template #cell-status="{ row }">
+                    <span
+                        v-if="(row as unknown as Visitor).banned_at"
+                        class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800"
+                    >
+                        Banned
+                    </span>
+                    <span v-else class="text-xs text-slate-400">—</span>
+                </template>
+            </DataTable>
         </div>
     </DashboardLayout>
 </template>
