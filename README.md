@@ -103,13 +103,18 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Point `.env` at your Postgres instance (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`,
-`DB_PASSWORD`), then create the database and role:
+Create the database and a role for it, picking your own password:
 
 ```bash
-psql -U postgres -c "CREATE ROLE custodia WITH LOGIN PASSWORD 'custodia_local_dev' CREATEDB;"
+psql -U postgres -c "CREATE ROLE custodia WITH LOGIN PASSWORD 'choose-a-password' CREATEDB;"
 psql -U postgres -c "CREATE DATABASE custodia OWNER custodia;"
+psql -U postgres -c "CREATE DATABASE custodia_test OWNER custodia;"
 ```
+
+Put that password into `.env` along with the rest of the connection details (`DB_HOST`,
+`DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`). The test suite reuses the same role
+and reads it from `.env` too, so there's nothing extra to configure. `phpunit.xml` only
+overrides the database name so tests can't touch your development data.
 
 Migrate and seed:
 
@@ -133,8 +138,11 @@ silently and you'll spend a while wondering why login does nothing.
 There's a `docker-compose.yml` and `Dockerfile` (Postgres, plus a container running
 `php artisan serve` with the frontend built into the image).
 
+Both `APP_KEY` and `DB_PASSWORD` have to be in the environment. Compose is set to fail with a
+message rather than fall back to a default, so a password never ends up hardcoded in the file:
+
 ```bash
-APP_KEY=$(php artisan key:generate --show) docker compose up --build
+APP_KEY=$(php artisan key:generate --show) DB_PASSWORD='choose-a-password' docker compose up --build
 ```
 
 Then seed it in another terminal:

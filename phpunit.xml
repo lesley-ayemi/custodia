@@ -20,12 +20,18 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
+        <!--
+            No DB_USERNAME/DB_PASSWORD here on purpose: they'd be a credential in
+            version control. PHPUnit's env values are set before Laravel boots and
+            Dotenv won't overwrite them, so the role and password come from .env
+            while the database name below still forces the test database. Don't add
+            a .env.testing file to hold them either, because Laravel loads that
+            *instead of* .env rather than alongside it, and APP_KEY disappears.
+        -->
         <env name="DB_CONNECTION" value="pgsql"/>
         <env name="DB_HOST" value="127.0.0.1"/>
         <env name="DB_PORT" value="5433"/>
         <env name="DB_DATABASE" value="custodia_test"/>
-        <env name="DB_USERNAME" value="custodia"/>
-        <env name="DB_PASSWORD" value="custodia_local_dev"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

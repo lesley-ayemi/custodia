@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: custodia
       POSTGRES_USER: custodia
-      POSTGRES_PASSWORD: custodia_local_dev
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set (see README)}
     volumes:
       - custodia_pgdata:/var/lib/postgresql/data
     ports:
@@ -29,7 +29,7 @@ services:
       DB_PORT: 5432
       DB_DATABASE: custodia
       DB_USERNAME: custodia
-      DB_PASSWORD: custodia_local_dev
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set (see README)}
       SESSION_DRIVER: database
       SANCTUM_STATEFUL_DOMAINS: localhost:8000
     depends_on:
