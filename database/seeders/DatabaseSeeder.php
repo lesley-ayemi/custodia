@@ -45,6 +45,7 @@ class DatabaseSeeder extends Seeder
 
             $this->call(HousingSeeder::class);
             $this->call(IncidentSeeder::class);
+            $this->call(CaseRecordsSeeder::class);
         }
     }
 }

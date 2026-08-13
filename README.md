@@ -4,6 +4,18 @@ A custody and welfare management system for a correctional facility. It covers a
 housing, sentences, court cases, medical care, visits, movements and releases, and keeps an
 audit trail of every action taken in it.
 
+![Dashboard](docs/screenshots/dashboard.png)
+
+| | |
+|---|---|
+| ![Prisoners](docs/screenshots/prisoners.png) | ![Prisoner profile](docs/screenshots/prisoner-profile.png) |
+| Searchable, sortable prisoner list | A prisoner profile with case, sentence and housing panels |
+| ![Housing](docs/screenshots/housing.png) | ![Audit log](docs/screenshots/audit-log.png) |
+| Block, wing and cell occupancy | The audit trail, showing before and after values |
+
+Everything above is the demo dataset from `php artisan migrate --seed`, so a fresh clone looks
+like this too.
+
 ## Why I built this
 
 This one comes from how prisons are run back home.

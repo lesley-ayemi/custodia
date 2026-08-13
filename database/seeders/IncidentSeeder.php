@@ -56,10 +56,10 @@ class IncidentSeeder extends Seeder
                 'location' => fake()->randomElement($this->locations),
                 'description' => fake()->sentence(12),
                 'occurred_at' => $occurredAt,
-            ]);
+            ], $officer);
 
             if ($status === 'under_review' || $status === 'resolved') {
-                $incidents->markUnderReview($incident);
+                $incidents->markUnderReview($incident, $supervisor);
             }
 
             if ($status === 'resolved') {
