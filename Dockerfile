@@ -39,9 +39,11 @@ EXPOSE 8080
 
 # Caching happens at boot, not at build: the environment variables these read
 # are only present at runtime, so baking them into the image would capture the
-# wrong values. Migrations are idempotent, so running them on start is safe.
+# wrong values. Migrating and seeding on start is safe because both are
+# idempotent - the seeder uses updateOrCreate for the demo accounts and only
+# creates prisoners when the table is empty.
 CMD php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache \
-    && php artisan migrate --force \
+    && php artisan migrate --force --seed \
     && frankenphp php-server -r public/ --listen ":${PORT:-8080}"
