@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Render (and most hosts) terminate TLS at a proxy and forward plain
+        // HTTP. Without this Laravel thinks the request is insecure and builds
+        // http:// asset URLs, which the browser then blocks as mixed content.
+        $middleware->trustProxies(at: '*');
+
         $middleware->statefulApi();
 
         $middleware->alias([
