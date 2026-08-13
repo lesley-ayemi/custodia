@@ -1,0 +1,107 @@
+# Render blueprint. In the Render dashboard: New > Blueprint, point it at this
+# repo, and it creates the database, the web service and the nightly demo reset
+# together. APP_KEY is the only value you have to type in yourself.
+databases:
+  - name: custodia-db
+    databaseName: custodia
+    user: custodia
+    plan: free
+
+services:
+  - type: web
+    name: custodia
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    envVars:
+      - key: APP_NAME
+        value: Custodia
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      # Generate with `php artisan key:generate --show` and paste it in.
+      # It has to keep the base64: prefix.
+      - key: APP_KEY
+        sync: false
+      # Set this to https://<your-service>.onrender.com after the first deploy.
+      - key: APP_URL
+        sync: false
+      # Sanctum's cookie auth fails silently if this doesn't match the host the
+      # browser is actually on, so it's wired to the service's own hostname.
+      - key: SANCTUM_STATEFUL_DOMAINS
+        fromService:
+          type: web
+          name: custodia
+          property: host
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_SECURE_COOKIE
+        value: true
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: custodia-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: custodia-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: custodia-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: custodia-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: custodia-db
+          property: password
+
+  # The demo credentials are public, so anyone can change the data. This wipes
+  # it back to the seeded state every night at 03:00 UTC.
+  - type: cron
+    name: custodia-demo-reset
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    schedule: "0 3 * * *"
+    dockerCommand: php artisan migrate:fresh --seed --force
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        sync: false
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: custodia-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: custodia-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: custodia-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: custodia-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: custodia-db
+          property: password

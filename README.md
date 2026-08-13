@@ -145,10 +145,35 @@ The app is at `http://localhost:8010`. One thing worth knowing: `SANCTUM_STATEFU
 (`localhost:8010,127.0.0.1:8010` by default). If it doesn't, Sanctum's cookie auth fails
 silently and you'll spend a while wondering why login does nothing.
 
+## Deploying
+
+There's a `render.yaml` blueprint for Render. In the dashboard pick New > Blueprint, point it
+at this repo, and it creates the Postgres database, the web service and a nightly job together.
+
+Two values need setting by hand afterwards:
+
+- `APP_KEY`, from `php artisan key:generate --show`. Keep the `base64:` prefix.
+- `APP_URL`, set to `https://<your-service>.onrender.com` once Render has assigned the domain.
+
+`SANCTUM_STATEFUL_DOMAINS` is wired to the service's own hostname in the blueprint, because
+getting it wrong is the failure where login does nothing and reports no error.
+
+The demo accounts below are public, so anyone can sign in and change things. The blueprint
+includes a cron job that runs `migrate:fresh --seed` at 03:00 UTC to put the data back. Cron
+jobs aren't part of Render's free tier, so either budget for that or drop the `cron` service
+from the blueprint and reseed by hand from the Render shell.
+
+Worth knowing before you rely on it: Render's free databases are removed after a limited
+trial period, and free web services sleep when idle, so the first request after a quiet spell
+takes a while to wake. Check their current terms.
+
+Vercel isn't a sensible target for this. It has no first-party PHP runtime, serverless gives
+you a read-only filesystem, and you'd need an external Postgres anyway.
+
 ## Docker
 
-There's a `docker-compose.yml` and `Dockerfile` (Postgres, plus a container running
-`php artisan serve` with the frontend built into the image).
+There's also a `docker-compose.yml` for running the whole thing locally (Postgres plus the app
+container, with the frontend built into the image).
 
 Both `APP_KEY` and `DB_PASSWORD` have to be in the environment. Compose is set to fail with a
 message rather than fall back to a default, so a password never ends up hardcoded in the file:
