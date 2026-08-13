@@ -162,10 +162,14 @@ Two values need setting by hand afterwards:
 `SANCTUM_STATEFUL_DOMAINS` is wired to the service's own hostname in the blueprint, because
 getting it wrong is the failure where login does nothing and reports no error.
 
-The blueprint only declares free resources, so it doesn't ask for payment details. Cron jobs
-aren't part of Render's free tier, which is why there isn't one here: the demo accounts below
-are public and anyone can change the data, so reseed it with `migrate:fresh --seed` when it
-gets messy.
+The blueprint only declares free resources, so it doesn't ask for payment details.
+
+The demo accounts below are public, so anyone signing in can change the data. Render's cron
+jobs aren't free, so the nightly reset runs as a GitHub Action instead
+(`.github/workflows/reset-demo.yml`), which wipes the database and reseeds it at 03:00 UTC. It
+needs one repository secret, `RENDER_DATABASE_URL`, set to the External Database URL from the
+Render dashboard. There's a `workflow_dispatch` trigger on it too, so you can reset on demand
+from the Actions tab.
 
 Worth knowing before you rely on it: Render's free databases are removed after a limited
 trial period, and free web services sleep when idle, so the first request after a quiet spell

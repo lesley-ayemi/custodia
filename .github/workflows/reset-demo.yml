@@ -1,0 +1,63 @@
+# Wipes the deployed demo database and reseeds it. The login details are in the
+# README, so anyone can change the data; this puts it back.
+#
+# Needs a repository secret called RENDER_DATABASE_URL, set to the External
+# Database URL from the Render dashboard.
+name: Reset demo data
+
+on:
+  schedule:
+    # 03:00 UTC daily. GitHub queues scheduled jobs, so it can run a bit late.
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+# Two resets running over each other would be a bad time.
+concurrency:
+  group: reset-demo
+  cancel-in-progress: false
+
+jobs:
+  reset:
+    name: Rebuild demo data
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql
+          coverage: none
+
+      - name: Check the database URL is configured
+        env:
+          DB_URL: ${{ secrets.RENDER_DATABASE_URL }}
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "RENDER_DATABASE_URL is not set."
+            echo "Add it under Settings > Secrets and variables > Actions, using the"
+            echo "External Database URL from the Render dashboard."
+            exit 1
+          fi
+
+      # --no-dev is fine here: faker is a main requirement because the seeders
+      # need it.
+      - name: Install dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # DB_URL overrides the individual DB_* values from .env.example, so this
+      # only ever touches the database the secret points at.
+      - name: Rebuild the demo database
+        env:
+          DB_CONNECTION: pgsql
+          DB_URL: ${{ secrets.RENDER_DATABASE_URL }}
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Summary
+        run: echo "Demo data reset at $(date -u '+%Y-%m-%d %H:%M UTC')." >> "$GITHUB_STEP_SUMMARY"
