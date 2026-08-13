@@ -16,6 +16,11 @@ FROM dunglas/frankenphp:1-php8.5-alpine AS app
 
 RUN install-php-extensions pdo_pgsql opcache
 
+# The image ships frankenphp with cap_net_bind_service set so it can bind :80.
+# Render refuses to exec a binary carrying file capabilities ("Operation not
+# permitted", exit 126) and we listen on a high port anyway, so strip them.
+RUN setcap -r /usr/local/bin/frankenphp 2>/dev/null || true
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
