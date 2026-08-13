@@ -4,6 +4,10 @@ A custody and welfare management system for a correctional facility. It covers a
 housing, sentences, court cases, medical care, visits, movements and releases, and keeps an
 audit trail of every action taken in it.
 
+**Live demo: [custodia-rsvq.onrender.com](https://custodia-rsvq.onrender.com)** — sign in with
+`admin@demo.com` / `password`, or use one of the other roles further down. It's on a free
+instance that sleeps when idle, so the first request after a quiet spell takes a moment.
+
 ![Dashboard](docs/screenshots/dashboard.png)
 
 | | |
