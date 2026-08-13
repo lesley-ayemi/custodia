@@ -12,7 +12,7 @@ RUN npm run build
 
 # FrankenPHP rather than `php artisan serve`, which is a single-threaded dev
 # server that Laravel's own docs tell you not to deploy.
-FROM dunglas/frankenphp:1-php8.3-alpine AS app
+FROM dunglas/frankenphp:1-php8.5-alpine AS app
 
 RUN install-php-extensions pdo_pgsql opcache
 

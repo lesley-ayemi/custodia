@@ -105,7 +105,7 @@ Seeded by `php artisan db:seed`. The password for all of them is `password`.
 
 ## Local setup (no Docker)
 
-You'll need PHP 8.3+, Composer, Node 22+, and a local PostgreSQL instance.
+You'll need PHP 8.4+, Composer, Node 22+, and a local PostgreSQL instance.
 
 ```bash
 composer install
@@ -148,7 +148,7 @@ silently and you'll spend a while wondering why login does nothing.
 ## Deploying
 
 There's a `render.yaml` blueprint for Render. In the dashboard pick New > Blueprint, point it
-at this repo, and it creates the Postgres database, the web service and a nightly job together.
+at this repo, and it creates the Postgres database and the web service together.
 
 Two values need setting by hand afterwards:
 
