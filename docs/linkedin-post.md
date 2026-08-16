@@ -4,7 +4,7 @@ Two versions. No em dashes in either. Copy whichever block you want.
 
 ## Short version
 
-Just over 1,000 characters. Reads in one glance.
+Around 1,700 characters. Still a quick read, with more on what the app actually does.
 
 ---
 
@@ -16,22 +16,33 @@ anything. They were awaiting trial. Most facilities still track them on paper.
 Files go missing. Someone then gets held past their release date because the document proving
 the date is gone.
 
-So I built Custodia, a prison management system that keeps a record of everything that happens
-to someone in custody.
+So I built Custodia. It covers the whole time someone spends inside: admission, housing,
+sentences, court cases, medical care, programmes, visits, transfers and release, across four
+staff roles, with an audit trail on every action.
 
 Live demo: https://custodia-rsvq.onrender.com
 admin@demo.com / password
 Also officer@, supervisor@ and medical@demo.com, same password, to see how the permissions
 change by role.
 
-Two decisions I care about in it:
+Some of what is in there:
+
+Admission is a gated pipeline. You cannot move past intake until someone records the legal
+authority for holding that person, and only medical staff can sign off the medical screening.
 
 Every change writes its audit entry inside the same database transaction as the change itself,
 so the log cannot drift away from what actually happened.
 
-Release runs a five step review that ends in a supervisor sign off no officer can perform.
+Release takes five steps and ends in a supervisor sign off that no officer can perform.
 
-Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 184 passing tests.
+Medical records sit behind their own role. Officers see the safety alerts they need to work
+safely and nothing clinical.
+
+The estate is modelled as facility, block, wing and cell. Occupancy is counted live from active
+assignments, so it cannot fall out of step with reality.
+
+Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 28 models, 14 service classes,
+20 policies, 184 passing tests.
 
 Code: https://github.com/lesley-ayemi/custodia
 
