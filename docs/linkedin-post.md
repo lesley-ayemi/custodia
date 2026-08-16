@@ -46,7 +46,11 @@ Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 28 models, 14 serv
 
 Code: https://github.com/lesley-ayemi/custodia
 
-Open to backend and full stack roles.
+All of it is open. Four logins on the demo, and every commit in the repo, including the ones
+where I broke something and had to go back and do it properly.
+
+Have a look and tell me what you would have built differently. And if you are hiring backend or
+full stack engineers, I am looking.
 
 #Laravel #VueJS #PHP #TypeScript #PostgreSQL #Nigeria
 
@@ -65,8 +69,8 @@ convicted of anything. They were awaiting trial. In March an independent panel c
 records to be digitised, because most facilities still run on paper.
 
 Those files go missing, and there is no second copy. Someone gets held past their release date
-because the document proving the date is gone. A court appearance gets missed. A transfer happens
-and nobody can say afterwards who approved it.
+because the document proving it is gone. A court date gets missed. A transfer happens and nobody
+can say afterwards who approved it.
 
 None of it needs bad faith. Paper cannot notice when something goes wrong.
 
@@ -76,46 +80,47 @@ Custodia handles admissions, housing, sentences, court cases, medical records, v
 and releases, and audits every action.
 
 Live demo: https://custodia-rsvq.onrender.com
-admin@demo.com / password
-Also officer@, supervisor@ and medical@demo.com, same password. Worth signing in as more than
-one, because what you can see and do changes.
+admin@demo.com / password, and officer@, supervisor@ and medical@demo.com on the same one.
+Worth trying more than one, because what you can see and do changes.
 
-The feature list is the boring part. Here is what I actually spent the time on.
+The feature list is the boring part. Here is what I spent the time on.
 
 Every state change writes its audit entry inside the same database transaction as the change
 itself. If those could commit separately the log would drift away from reality, and an audit
 trail you cannot trust is not worth keeping.
 
-Admission runs as a gated pipeline. You cannot move past intake until someone records the legal
-authority for holding that person, and only medical staff can sign off the medical screening.
+Admission is a gated pipeline. You cannot move past intake until someone records the legal
+authority for holding that person, and only medical staff can sign off the screening.
 
-Release goes through five steps and finishes with a supervisor approval that officers are not
-able to perform. I wanted one point in the system where one person acting alone is not enough.
+Release goes through five steps and ends in a supervisor approval no officer can perform. I
+wanted one point where a single person acting alone is not enough.
 
-Medical records sit behind their own role. Officers and supervisors see the operational alerts
-they need to work safely, and nothing clinical.
+Medical records sit behind their own role. Officers and supervisors see the safety alerts they
+need and nothing clinical.
 
 Then I audited my own code, and found two things I had got wrong.
 
 Cell capacity was only enforced by the interface filtering a dropdown. A direct API call
 could put twenty people in a two bed cell. Fixing it needed a row lock as well as a check,
-because two requests arriving together would otherwise both read the same free bed count and
-overfill it anyway.
+because two requests arriving together would otherwise both read the same count and overfill it.
 
 The second one was worse. Resolving an incident wrote "previously under review" into the audit
 log no matter what the real previous status had been, and let you skip review entirely. So the record
 was describing something that had not happened. For a system built on a trustworthy log, that
 was the worst bug in it.
 
-I wrote regression tests for both, then reverted each fix on purpose to watch the tests fail.
-Otherwise I would just be trusting a green tick.
+I wrote regression tests for both, then reverted each fix to watch the tests fail. Otherwise I
+am only trusting a green tick.
 
-Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 28 models, 14 service classes,
-20 policies, 36 migrations, roughly 14,500 lines, 184 passing tests.
+Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 28 models, 14 services,
+20 policies, 36 migrations, 184 passing tests.
 
 Code: https://github.com/lesley-ayemi/custodia
 
-I am looking for backend or full stack work. The demo is up and the code is open.
+All of it is open, including the commits where I broke something and had to go back and do it
+properly. Have a look and tell me what you would have built differently.
+
+If you are hiring backend or full stack engineers, I am looking.
 
 #Laravel #VueJS #PHP #TypeScript #PostgreSQL #SoftwareEngineering #Nigeria
 
