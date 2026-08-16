@@ -4,7 +4,7 @@ Two versions. No em dashes in either. Copy whichever block you want.
 
 ## Short version
 
-Roughly 950 characters. Reads in one glance, no "see more" needed on desktop.
+Just over 1,000 characters. Reads in one glance.
 
 ---
 
@@ -20,7 +20,9 @@ So I built Custodia, a prison management system that keeps a record of everythin
 to someone in custody.
 
 Live demo: https://custodia-rsvq.onrender.com
-Sign in with admin@demo.com / password
+admin@demo.com / password
+Also officer@, supervisor@ and medical@demo.com, same password, to see how the permissions
+change by role.
 
 Two decisions I care about in it:
 
@@ -41,7 +43,7 @@ Open to backend and full stack roles.
 
 ## Long version
 
-Roughly 2,960 characters, just inside LinkedIn's 3,000 limit.
+Just under LinkedIn's 3,000 character limit.
 
 ---
 
@@ -55,16 +57,17 @@ Those files go missing, and there is no second copy. Someone gets held past thei
 because the document proving the date is gone. A court appearance gets missed. A transfer happens
 and nobody can say afterwards who approved it.
 
-None of that needs anyone acting in bad faith. Paper has no way of noticing when something has
-gone wrong.
+None of it needs bad faith. Paper cannot notice when something goes wrong.
 
 So I built one that does.
 
 Custodia handles admissions, housing, sentences, court cases, medical records, visits, movements
-and releases, and keeps an audit trail of every action.
+and releases, and audits every action.
 
 Live demo: https://custodia-rsvq.onrender.com
-Sign in with admin@demo.com / password
+admin@demo.com / password
+Also officer@, supervisor@ and medical@demo.com, same password. Worth signing in as more than
+one, because what you can see and do changes.
 
 The feature list is the boring part. Here is what I actually spent the time on.
 
@@ -76,23 +79,22 @@ Admission runs as a gated pipeline. You cannot move past intake until someone re
 authority for holding that person, and only medical staff can sign off the medical screening.
 
 Release goes through five steps and finishes with a supervisor approval that officers are not
-able to perform. I wanted at least one point in the system where one person acting alone is not
-enough.
+able to perform. I wanted one point in the system where one person acting alone is not enough.
 
 Medical records sit behind their own role. Officers and supervisors see the operational alerts
 they need to work safely, and nothing clinical.
 
 Then I audited my own code, and found two things I had got wrong.
 
-Cell capacity was only ever enforced by the interface filtering a dropdown. A direct API call
-could put twenty people in a two bed cell. Fixing it needed a row lock as well as a
-check, because two requests arriving together would otherwise both read the same free bed count
-and overfill it anyway.
+Cell capacity was only enforced by the interface filtering a dropdown. A direct API call
+could put twenty people in a two bed cell. Fixing it needed a row lock as well as a check,
+because two requests arriving together would otherwise both read the same free bed count and
+overfill it anyway.
 
 The second one was worse. Resolving an incident wrote "previously under review" into the audit
-log no matter what the real previous status had been, and it let you skip the review step
-entirely. So the record was describing something that had not happened. For a system built around
-a trustworthy log, that was the worst bug in there.
+log no matter what the real previous status had been, and let you skip review entirely. So the record
+was describing something that had not happened. For a system built on a trustworthy log, that
+was the worst bug in it.
 
 I wrote regression tests for both, then reverted each fix on purpose to watch the tests fail.
 Otherwise I would just be trusting a green tick.
@@ -102,8 +104,7 @@ Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 28 models, 14 serv
 
 Code: https://github.com/lesley-ayemi/custodia
 
-I am looking for backend or full stack work. The demo is up and the code is open, so have a dig
-around.
+I am looking for backend or full stack work. The demo is up and the code is open.
 
 #Laravel #VueJS #PHP #TypeScript #PostgreSQL #SoftwareEngineering #Nigeria
 
