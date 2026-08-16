@@ -1,6 +1,47 @@
 # LinkedIn post for Custodia
 
-Copy the block between the two rules. No em dashes anywhere in it.
+Two versions. No em dashes in either. Copy whichever block you want.
+
+## Short version
+
+Roughly 950 characters. Reads in one glance, no "see more" needed on desktop.
+
+---
+
+64%.
+
+As of February, 51,955 of the 80,812 people held in Nigerian custody had not been convicted of
+anything. They were awaiting trial. Most facilities still track them on paper.
+
+Files go missing. Someone then gets held past their release date because the document proving
+the date is gone.
+
+So I built Custodia, a prison management system that keeps a record of everything that happens
+to someone in custody.
+
+Live demo: https://custodia-rsvq.onrender.com
+Sign in with admin@demo.com / password
+
+Two decisions I care about in it:
+
+Every change writes its audit entry inside the same database transaction as the change itself,
+so the log cannot drift away from what actually happened.
+
+Release runs a five step review that ends in a supervisor sign off no officer can perform.
+
+Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 184 passing tests.
+
+Code: https://github.com/lesley-ayemi/custodia
+
+Open to backend and full stack roles.
+
+#Laravel #VueJS #PHP #TypeScript #PostgreSQL #Nigeria
+
+---
+
+## Long version
+
+Roughly 2,960 characters, just inside LinkedIn's 3,000 limit.
 
 ---
 
