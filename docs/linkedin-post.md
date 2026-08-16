@@ -1,83 +1,88 @@
-# LinkedIn post — Custodia
+# LinkedIn post for Custodia
 
-## Main feed post (2,730 characters, fits LinkedIn's 3,000 limit)
+Copy the block between the two rules. No em dashes anywhere in it.
 
 ---
 
 64%.
 
-As of February this year, 51,955 of the 80,812 people held in Nigerian custody were awaiting
-trial, not serving a sentence. An independent panel spent March calling for inmate records to be
-digitised, because most facilities still run on handwritten registers and paper case files.
+As of February this year, 51,955 of the 80,812 people held in Nigerian custody had not been
+convicted of anything. They were awaiting trial. In March an independent panel called for inmate
+records to be digitised, because most facilities still run on paper.
 
-When the paper is the only copy, people get lost in the system. Held past a release date because
-the document proving the date went missing. Court appearances missed. Transfers with nobody
-recorded as having approved them.
+Those files go missing, and there is no second copy. Someone gets held past their release date
+because the document proving the date is gone. A court appearance gets missed. A transfer happens
+and nobody can say afterwards who approved it.
 
-Nobody has to act in bad faith for that to happen. A paper system just has no way of noticing
-when something has gone wrong.
+None of that needs anyone acting in bad faith. Paper has no way of noticing when something has
+gone wrong.
 
 So I built one that does.
 
-Custodia is a custody and welfare management system: admissions, housing, sentences, court cases,
-medical records, visits, movements and releases, with an audit trail on every action.
+Custodia handles admissions, housing, sentences, court cases, medical records, visits, movements
+and releases, and keeps an audit trail of every action.
 
-Live demo → https://custodia-rsvq.onrender.com
-Sign in as admin@demo.com / password
+Live demo: https://custodia-rsvq.onrender.com
+Sign in with admin@demo.com / password
 
-The parts I'm proudest of aren't features, they're the decisions underneath them:
+The feature list is the boring part. Here is what I actually spent the time on.
 
-→ Every state change writes its audit entry inside the same database transaction. If the log and
-the change could commit separately, the log would eventually start lying, which defeats the point
-of keeping one.
+Every state change writes its audit entry inside the same database transaction as the change
+itself. If those could commit separately the log would drift away from reality, and an audit
+trail you cannot trust is not worth keeping.
 
-→ Admission is a gated pipeline. You can't move past intake without recording the legal authority
-for holding someone. Medical screening can only be signed off by medical staff.
+Admission runs as a gated pipeline. You cannot move past intake until someone records the legal
+authority for holding that person, and only medical staff can sign off the medical screening.
 
-→ Release runs a five-step review ending in a supervisor approval that officers cannot perform.
-Some decisions should need a second person.
+Release goes through five steps and finishes with a supervisor approval that officers are not
+able to perform. I wanted at least one point in the system where one person acting alone is not
+enough.
 
-→ Medical records sit behind their own role. Officers see the operational alerts they need to
-work safely and nothing clinical.
+Medical records sit behind their own role. Officers and supervisors see the operational alerts
+they need to work safely, and nothing clinical.
 
-Then I audited my own code and found problems worth admitting to:
+Then I audited my own code, and found two things I had got wrong.
 
-Cell capacity was only ever enforced by the UI filtering a dropdown. A direct API call could pack
-unlimited people into a two-bed cell. The fix needed a row lock, not just a check, or two
-simultaneous requests would both read the same free-bed count and overfill it anyway.
+Cell capacity was only ever enforced by the interface filtering a dropdown. A direct API call
+could put twenty people in a two bed cell. Fixing it needed a row lock as well as a
+check, because two requests arriving together would otherwise both read the same free bed count
+and overfill it anyway.
 
-Worse, resolving an incident wrote "previously under review" into the audit log regardless of the
-real previous status, and could skip review entirely. The audit trail was lying. In a system whose
-entire premise is a trustworthy record, that was the most serious thing in the codebase.
+The second one was worse. Resolving an incident wrote "previously under review" into the audit
+log no matter what the real previous status had been, and it let you skip the review step
+entirely. So the record was describing something that had not happened. For a system built around
+a trustworthy log, that was the worst bug in there.
 
-I wrote regression tests for each one, then deliberately reverted the fixes to confirm the tests
-actually failed. A test that passes with and without the fix is worth nothing.
+I wrote regression tests for both, then reverted each fix on purpose to watch the tests fail.
+Otherwise I would just be trusting a green tick.
 
-The numbers: Laravel 13 + Vue 3 + TypeScript + PostgreSQL. 107 API endpoints, 28 models, 14
-service classes, 20 policies, 36 migrations, ~14,500 lines. 184 passing tests.
+Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 28 models, 14 service classes,
+20 policies, 36 migrations, roughly 14,500 lines, 184 passing tests.
 
 Code: https://github.com/lesley-ayemi/custodia
 
-I'm looking for backend or full-stack roles. If you're hiring, the demo is up and the code is
-open.
+I am looking for backend or full stack work. The demo is up and the code is open, so have a dig
+around.
 
-#Laravel #VueJS #PHP #TypeScript #PostgreSQL #SoftwareEngineering #WebDevelopment #Nigeria
+#Laravel #VueJS #PHP #TypeScript #PostgreSQL #SoftwareEngineering #Nigeria
 
 ---
 
-## Screenshot order (attach 4-5, in this order)
+## Screenshots to attach, in this order
 
-1. `docs/screenshots/dashboard.png` — leads with the strongest visual
-2. `docs/screenshots/prisoner-profile.png` — shows depth and data modelling
-3. `docs/screenshots/housing.png` — Block/Wing/Cell occupancy
-4. `docs/screenshots/audit-log.png` — backs up the audit-trail claim
-5. `docs/screenshots/prisoners.png` — optional, the searchable/sortable table
+1. docs/screenshots/dashboard.png
+2. docs/screenshots/prisoner-profile.png
+3. docs/screenshots/housing.png
+4. docs/screenshots/audit-log.png
+5. docs/screenshots/prisoners.png (optional)
 
-## Sources used
+## Sources
 
-- NCoS figures (Feb 2026): 51,955 of 80,812 awaiting trial
-  https://www.thecable.ng/ncos-51955-out-of-80812-inmates-in-nigerias-prisons-are-awaiting-trial/
-- Independent panel calling for digitisation (Mar 2026)
-  https://dailypost.ng/2026/03/26/independent-panel-calls-for-digitisation-staff-welfare-reforms-in-nigeria-correctional-service/
-- Paper-based record keeping in Nigerian prisons (academic)
-  https://www.researchgate.net/publication/375459249_DIGITALIZING_PRISON_MANAGEMENT_RECORDS_IN_A_DEVELOPING_ECONOMY
+NCoS figures, February 2026, 51,955 of 80,812 awaiting trial:
+https://www.thecable.ng/ncos-51955-out-of-80812-inmates-in-nigerias-prisons-are-awaiting-trial/
+
+Independent panel calling for digitisation, March 2026:
+https://dailypost.ng/2026/03/26/independent-panel-calls-for-digitisation-staff-welfare-reforms-in-nigeria-correctional-service/
+
+Paper based record keeping in Nigerian prisons:
+https://www.researchgate.net/publication/375459249_DIGITALIZING_PRISON_MANAGEMENT_RECORDS_IN_A_DEVELOPING_ECONOMY
