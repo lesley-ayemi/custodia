@@ -42,8 +42,13 @@ EXPOSE 8080
 # wrong values. Migrating and seeding on start is safe because both are
 # idempotent - the seeder uses updateOrCreate for the demo accounts and only
 # creates prisoners when the table is empty.
+#
+# Migrations deliberately cannot stop the web server from starting. They used to
+# sit in the && chain, so when the database went away the whole site stopped
+# answering and requests just hung, instead of serving an error anyone could read.
 CMD php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache \
-    && php artisan migrate --force --seed \
-    && frankenphp php-server -r public/ --listen ":${PORT:-8080}"
+    && { php artisan migrate --force --seed \
+         || echo "WARNING: migrate/seed failed. Starting the web server anyway so the error is visible over HTTP."; } \
+    && exec frankenphp php-server -r public/ --listen ":${PORT:-8080}"
