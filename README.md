@@ -151,29 +151,39 @@ silently and you'll spend a while wondering why login does nothing.
 
 ## Deploying
 
-There's a `render.yaml` blueprint for Render. In the dashboard pick New > Blueprint, point it
-at this repo, and it creates the Postgres database and the web service together.
+The app runs on Render and the database is on Supabase. Render's `render.yaml` blueprint
+creates the web service: in the dashboard pick New > Blueprint and point it at this repo.
 
-Two values need setting by hand afterwards:
+Three values need setting by hand afterwards:
 
 - `APP_KEY`, from `php artisan key:generate --show`. Keep the `base64:` prefix.
 - `APP_URL`, set to `https://<your-service>.onrender.com` once Render has assigned the domain.
+- `DB_URL`, the Supabase connection string.
+
+For `DB_URL`, take the **session pooler** string from Supabase under Connect, the one on port
+5432 that looks like
+`postgresql://postgres.<project-ref>:<password>@aws-<region>.pooler.supabase.com:5432/postgres`.
+
+Use that one specifically. Supabase's direct connection is IPv6 only unless you pay for the
+IPv4 add-on, and Render dials out over IPv4, so the direct string cannot resolve from there.
+The transaction pooler on port 6543 fails differently, by breaking the prepared statements PDO
+relies on. Laravel reads `DB_URL` ahead of the individual `DB_HOST` and `DB_DATABASE` values,
+so it is the only database setting you need.
 
 `SANCTUM_STATEFUL_DOMAINS` is wired to the service's own hostname in the blueprint, because
 getting it wrong is the failure where login does nothing and reports no error.
 
-The blueprint only declares free resources, so it doesn't ask for payment details.
-
 The demo accounts below are public, so anyone signing in can change the data. Render's cron
 jobs aren't free, so the nightly reset runs as a GitHub Action instead
 (`.github/workflows/reset-demo.yml`), which wipes the database and reseeds it at 03:00 UTC. It
-needs one repository secret, `RENDER_DATABASE_URL`, set to the External Database URL from the
-Render dashboard. There's a `workflow_dispatch` trigger on it too, so you can reset on demand
-from the Actions tab.
+needs one repository secret, `DEMO_DATABASE_URL`, holding that same session pooler string.
+There's a `workflow_dispatch` trigger on it too, so you can reset on demand from the Actions
+tab.
 
-Worth knowing before you rely on it: Render's free databases are removed after a limited
-trial period, and free web services sleep when idle, so the first request after a quiet spell
-takes a while to wake. Check their current terms.
+The database started out on Render's free Postgres, which gets deleted after 30 days. It was,
+in September, and the demo went down. Supabase free projects are not deleted, though they do
+pause after about a week without traffic. Render's free web service still sleeps when idle, so
+the first request after a quiet spell takes a while to wake.
 
 Vercel isn't a sensible target for this. It has no first-party PHP runtime, serverless gives
 you a read-only filesystem, and you'd need an external Postgres anyway.

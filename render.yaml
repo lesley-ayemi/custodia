@@ -1,12 +1,10 @@
 # Render blueprint. In the Render dashboard: New > Blueprint, point it at this
-# repo, and it creates the database, the web service and the nightly demo reset
-# together. APP_KEY is the only value you have to type in yourself.
-databases:
-  - name: custodia-db
-    databaseName: custodia
-    user: custodia
-    plan: free
-
+# repo, and it creates the web service.
+#
+# The database lives on Supabase rather than Render, because Render's free
+# Postgres is deleted after 30 days and the demo went dark in September when
+# that happened. Supabase free projects are not deleted, though they do pause
+# after a week or so of no traffic.
 services:
   - type: web
     name: custodia
@@ -47,23 +45,17 @@ services:
         value: stderr
       - key: DB_CONNECTION
         value: pgsql
-      - key: DB_HOST
-        fromDatabase:
-          name: custodia-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: custodia-db
-          property: port
-      - key: DB_DATABASE
-        fromDatabase:
-          name: custodia-db
-          property: database
-      - key: DB_USERNAME
-        fromDatabase:
-          name: custodia-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: custodia-db
-          property: password
+      # One connection string instead of five separate values. Laravel reads
+      # DB_URL first and it overrides any DB_HOST/DB_DATABASE/etc.
+      #
+      # Copy this from Supabase: Connect > Session pooler. It has to be the
+      # session pooler on port 5432, not the direct connection. Supabase's
+      # direct connection is IPv6 only unless you pay for the IPv4 add-on, and
+      # Render dials out over IPv4, so the direct string cannot resolve from
+      # here. The transaction pooler on 6543 is no good either, because it
+      # breaks the prepared statements PDO relies on.
+      #
+      # Looks like:
+      #   postgresql://postgres.<project-ref>:<password>@aws-<region>.pooler.supabase.com:5432/postgres
+      - key: DB_URL
+        sync: false
