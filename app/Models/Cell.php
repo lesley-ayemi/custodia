@@ -27,6 +27,17 @@ class Cell extends Model
 
     public function occupancy(): int
     {
+        // withCount('activeAssignments') leaves the number in the attributes, so
+        // use it when the caller has already paid for it. Listing a whole block
+        // without this costs one count query per cell.
+        //
+        // It is a snapshot from whenever the parent query ran, which is fine for
+        // display. Anything enforcing capacity has to re-read the cell under a
+        // row lock, as HousingService::assign does.
+        if (array_key_exists('active_assignments_count', $this->attributes)) {
+            return (int) $this->attributes['active_assignments_count'];
+        }
+
         return $this->activeAssignments()->count();
     }
 
