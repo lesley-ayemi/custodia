@@ -214,11 +214,15 @@ This one runs on `http://localhost:8000`.
 ./vendor/bin/pest
 ```
 
-184 feature tests. They cover authentication and role permissions, prisoner CRUD, housing
+192 feature tests. They cover authentication and role permissions, prisoner CRUD, housing
 assignment history, the admission and release workflows, incidents, medical access
 restrictions, visits, movements and sentences. There's also a security regression suite
 covering login throttling, cell capacity enforcement, workflow state guards and audit
 integrity, which came out of an audit pass over the whole codebase.
+
+Two of them count the queries the dashboard and the housing list run against a small estate
+and then a much bigger one, and fail if the number went up. Both pages used to count
+occupancy a cell at a time, so they got slower every time a cell was added.
 
 Tests run against a dedicated `custodia_test` Postgres database configured in `phpunit.xml`
 rather than SQLite, because the prisoner search uses Postgres's `ILIKE`.
@@ -241,3 +245,8 @@ would need keeping in sync. Statuses and types are PHP backed enums cast on the 
 invalid state fails at the boundary instead of somewhere further in. Every endpoint returns an
 API Resource, so the JSON shape is explicit and database columns don't leak into responses by
 accident.
+
+Occupancy being derived rather than stored does mean it has to be counted, and counting it per
+cell is how both the dashboard and the housing list ended up running a query per cell. They
+sum it in the database now. The capacity check is the exception: it re-reads the cell under a
+row lock, because a count from a moment ago is not something you want to admit someone on.

@@ -42,7 +42,7 @@ The estate is modelled as facility, block, wing and cell. Occupancy is counted l
 assignments, so it cannot fall out of step with reality.
 
 Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 28 models, 14 service classes,
-20 policies, 184 passing tests.
+20 policies, 192 passing tests.
 
 Code: https://github.com/lesley-ayemi/custodia
 
@@ -113,7 +113,7 @@ I wrote regression tests for both, then reverted each fix to watch the tests fai
 am only trusting a green tick.
 
 Laravel 13, Vue 3, TypeScript, PostgreSQL. 107 API endpoints, 28 models, 14 services,
-20 policies, 36 migrations, 184 passing tests.
+20 policies, 36 migrations, 192 passing tests.
 
 Code: https://github.com/lesley-ayemi/custodia
 
